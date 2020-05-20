@@ -1,0 +1,40 @@
+---
+title: "Serie de pasajeros en vuelos internacionales"
+---
+
+Esta serie detalla los miles de pasajeros que han volado a nivel mundial en el período indicado
+
+```{r}
+library(fpp2)
+AirPassengers
+autoplot(AirPassengers) +
+  ggtitle("Monthly Airline Passenger Numbers 1949-1960")
+```
+
+Análisis de componentes presentes en la serie.
+
+Autocorrelogramas
+
+```{r}
+ggtsdisplay(AirPassengers)
+```
+
+Gráficos de estacionalidad
+
+```{r}
+forecast::ggseasonplot(AirPassengers)
+forecast::ggseasonplot(AirPassengers, polar = TRUE)
+forecast::ggsubseriesplot(AirPassengers)
+```
+
+Pruebas analíticas para determinar presencia de tendencia y estacionalidad: test de Cox-Stuart y test de Friedman.
+
+```{r}
+library(randtests)
+randtests::cox.stuart.test(AirPassengers)
+library(seastests)
+seastests::fried(AirPassengers)
+```
+
+
+

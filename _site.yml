@@ -1,12 +1,22 @@
-name: "my-website"
+name: "My Website"
 output_dir: "."
 navbar:
-  title: "My Website"
+  title: "Pronósticos"
   left:
     - text: "Home"
       href: index.html
+    - text: "Análisis de la serie"
+      href: analisis.html
+    - text: "Regresión"  
+      href: regresion.html
+    - text: "Descomposición"  
+      href: descomposicion.html
+    - text: "Suavización exponencial"
+      href: exposmooth.html
+    - text: "ARIMA"
+      href: arima.html
     - text: "About"
-      href: about.html
+      href: about.html  
 output:
   html_document:
     theme: united
