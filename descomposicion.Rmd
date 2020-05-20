@@ -1,0 +1,48 @@
+---
+title: "Descomposición estacional"
+---
+
+Esta es la descomposición de la serie usando STL, aislando el componente estacional y dejando aparte el componente de tendencia ciclo para ser usado como base para realizar el pronóstico:  
+
+
+```{r}
+a <- forecast::mstl(AirPassengers)
+head(a, 10)
+autoplot(mstl(AirPassengers)) +
+  ggtitle("Descomposicion de la serie de Air Passangers")
+
+```
+
+Y el pronóstico para los próximos cuatro períodos usando los diferentes métodos  sería:
+
+```{r}
+library(gridExtra)
+pronostico.stl1 <- stlf(ausbeer, method = "naive", h = 4)
+pronostico.stl1
+g1 <- autoplot(pronostico.stl1) + ggtitle("Método naive")
+g1
+pronostico.stl1$mean
+
+
+pronostico.stl2 <- stlf(ausbeer, method = "ets", h = 4)
+pronostico.stl2
+g2 <- autoplot(pronostico.stl1) + ggtitle("Método ETS")
+g2
+
+pronostico.stl3 <- stlf(ausbeer, method = "arima", h = 4)
+pronostico.stl3
+g3 <- autoplot(pronostico.stl1) + ggtitle("Método ARIMA")
+g3
+
+pronostico.stl4 <- stlf(ausbeer, method = "rwdrift", h = 4)
+pronostico.stl4
+g4 <- autoplot(pronostico.stl1) + ggtitle("Método rwdrift")
+g4
+
+grid.arrange(g1, g2, g3, g4, nrow = 2, ncol = 2)
+
+```
+
+
+
+
