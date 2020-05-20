@@ -2,4 +2,4 @@
 title: "About This Website"
 ---
 
-More about this website.
+Más información sobre mi página Web
