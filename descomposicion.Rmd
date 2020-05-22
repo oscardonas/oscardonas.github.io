@@ -116,4 +116,14 @@ knitr::kable(errores.stl)
 
 Con base en los errores del pronóstico, se recomienda utilizar el pronóstico generado con el método ARIMA.
 
+##  
+
+```{r}
+errores.mejor.stl <- errores.stl3
+errores.mejor.stl <- matrix(errores.mejor.stl, 1, 2)
+colnames(errores.mejor.stl) <- c("MAE", "MSE")
+rownames(errores.mejor.stl) <- "Mejor STL (ARIMA)"
+knitr::kable(errores.mejor.stl)
+
+```
 

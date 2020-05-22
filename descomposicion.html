@@ -546,6 +546,30 @@ knitr::kable(errores.stl)</code></pre>
 <h2></h2>
 <p>Con base en los errores del pronóstico, se recomienda utilizar el pronóstico generado con el método ARIMA.</p>
 </div>
+<div id="section-17" class="section level2">
+<h2></h2>
+<pre class="r"><code>errores.mejor.stl &lt;- errores.stl3
+errores.mejor.stl &lt;- matrix(errores.mejor.stl, 1, 2)
+colnames(errores.mejor.stl) &lt;- c(&quot;MAE&quot;, &quot;MSE&quot;)
+rownames(errores.mejor.stl) &lt;- &quot;Mejor STL (ARIMA)&quot;
+knitr::kable(errores.mejor.stl)</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th></th>
+<th align="right">MAE</th>
+<th align="right">MSE</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Mejor STL (ARIMA)</td>
+<td align="right">15.31139</td>
+<td align="right">475.1667</td>
+</tr>
+</tbody>
+</table>
+</div>
 
 
 
