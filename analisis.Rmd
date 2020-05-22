@@ -2,6 +2,10 @@
 title: "Serie de pasajeros en vuelos internacionales"
 ---
 
+##   
+## 1. Análisis descriptivo de la serie
+##   
+
 Esta serie detalla los miles de pasajeros que han volado a nivel mundial en el período indicado
 
 ```{r}
@@ -11,7 +15,16 @@ autoplot(AirPassengers) +
   ggtitle("Monthly Airline Passenger Numbers 1949-1960")
 ```
 
-Análisis de componentes presentes en la serie.
+```{r}
+library(summarytools)
+library(knitr)
+kable(descr(AirPassengers), caption = "Resumen de estadísticos descriptivos")
+
+```
+
+##    
+## 2. Análisis de componentes presentes en la serie
+##   
 
 Autocorrelogramas
 
@@ -36,5 +49,35 @@ library(seastests)
 seastests::fried(AirPassengers)
 ```
 
+
+
+1. El análisis del gráfico secuencial de la serie muestra la presencia tanto de tendencia como de estacionalidad.
+2. El análisis del ACF también indica la existencia de tendencia marcada (por la caída suave de los coeficientes de correlación significativos) y de estacionalidad (porque el coeficiente de correlación #12 es significativo).
+3. El resultado de la prueba de Cox-Stuart permite concluir que existe tendencia y el resultado de la prueba de Friedman lleva a concluir que hay estacionalidad (en ambos casos se rechaza la hipótesis nula según la cual el componente no está presente).
+
+
+
+
+##   
+## 3. Separación de datos de entrenamiento y de prueba
+##   
+
+```{r}
+datos.training <- window(AirPassengers, end = c(1959, 12))
+datos.test     <- window(AirPassengers, start = c(1960, 1))
+
+```
+
+#### Datos de entrenamiento para construir los modelos
+
+```{r}
+datos.training
+```
+
+#### Datosde prueba para calcular el error del pronóstico
+
+```{r}
+datos.test
+```
 
 

@@ -11,7 +11,7 @@
 
 
 
-<title>exposmooth.utf8.md</title>
+<title>Suavización exponencial</title>
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -316,11 +316,181 @@ $(document).ready(function () {
 
 
 
+<h1 class="title toc-ignore">Suavización exponencial</h1>
 
 </div>
 
 
-
+<div id="section" class="section level2">
+<h2></h2>
+</div>
+<div id="suavizacion-exponencial-usando-ets" class="section level2">
+<h2>1. Suavización exponencial usando ETS</h2>
+</div>
+<div id="section-1" class="section level2">
+<h2></h2>
+<p>Este es el mejor modelo de suavización exponencial recomendado por el método ETS, que toma como criterio el AICc para discriminar entre varios modelos:</p>
+<div id="section-2" class="section level4">
+<h4></h4>
+<pre class="r"><code>a &lt;- ets(datos.training)
+a</code></pre>
+<pre><code>## ETS(M,Ad,M) 
+## 
+## Call:
+##  ets(y = datos.training) 
+## 
+##   Smoothing parameters:
+##     alpha = 0.758 
+##     beta  = 0.0213 
+##     gamma = 1e-04 
+##     phi   = 0.98 
+## 
+##   Initial states:
+##     l = 120.7483 
+##     b = 1.7632 
+##     s = 0.897 0.798 0.919 1.0587 1.2156 1.2251
+##            1.1075 0.9782 0.9804 1.0207 0.8926 0.9073
+## 
+##   sigma:  0.0378
+## 
+##      AIC     AICc      BIC 
+## 1244.458 1250.511 1296.348</code></pre>
+<pre class="r"><code>summary(a)</code></pre>
+<pre><code>## ETS(M,Ad,M) 
+## 
+## Call:
+##  ets(y = datos.training) 
+## 
+##   Smoothing parameters:
+##     alpha = 0.758 
+##     beta  = 0.0213 
+##     gamma = 1e-04 
+##     phi   = 0.98 
+## 
+##   Initial states:
+##     l = 120.7483 
+##     b = 1.7632 
+##     s = 0.897 0.798 0.919 1.0587 1.2156 1.2251
+##            1.1075 0.9782 0.9804 1.0207 0.8926 0.9073
+## 
+##   sigma:  0.0378
+## 
+##      AIC     AICc      BIC 
+## 1244.458 1250.511 1296.348 
+## 
+## Training set error measures:
+##                    ME     RMSE      MAE       MPE     MAPE      MASE
+## Training set 1.511141 9.353686 6.980909 0.4422335 2.761156 0.2292581
+##                   ACF1
+## Training set 0.0457192</code></pre>
+</div>
+</div>
+<div id="section-3" class="section level2">
+<h2></h2>
+</div>
+<div id="calculo-del-pronostico" class="section level2">
+<h2>2. Cálculo del pronóstico</h2>
+</div>
+<div id="section-4" class="section level2">
+<h2></h2>
+<pre class="r"><code>pronostico.ets &lt;- forecast(ets(datos.training), h = 12)
+pronostico.ets</code></pre>
+<pre><code>##          Point Forecast    Lo 80    Hi 80    Lo 95    Hi 95
+## Jan 1960       411.9115 391.9778 431.8452 381.4255 442.3974
+## Feb 1960       406.9694 382.0344 431.9043 368.8346 445.1041
+## Mar 1960       467.3486 433.5448 501.1524 415.6501 519.0470
+## Apr 1960       450.7386 413.6375 487.8397 393.9974 507.4798
+## May 1960       451.5327 410.1879 492.8776 388.3012 514.7642
+## Jun 1960       513.2314 461.7576 564.7052 434.5091 591.9538
+## Jul 1960       569.8868 507.9846 631.7890 475.2156 664.5580
+## Aug 1960       567.5873 501.3865 633.7882 466.3419 668.8328
+## Sep 1960       496.1471 434.4291 557.8652 401.7575 590.5368
+## Oct 1960       432.2153 375.1873 489.2432 344.9985 519.4320
+## Nov 1960       376.6263 324.1565 429.0961 296.3807 456.8719
+## Dec 1960       424.7869 362.5403 487.0334 329.5889 519.9848</code></pre>
+<pre class="r"><code>summary(pronostico.ets)</code></pre>
+<pre><code>## 
+## Forecast method: ETS(M,Ad,M)
+## 
+## Model Information:
+## ETS(M,Ad,M) 
+## 
+## Call:
+##  ets(y = datos.training) 
+## 
+##   Smoothing parameters:
+##     alpha = 0.758 
+##     beta  = 0.0213 
+##     gamma = 1e-04 
+##     phi   = 0.98 
+## 
+##   Initial states:
+##     l = 120.7483 
+##     b = 1.7632 
+##     s = 0.897 0.798 0.919 1.0587 1.2156 1.2251
+##            1.1075 0.9782 0.9804 1.0207 0.8926 0.9073
+## 
+##   sigma:  0.0378
+## 
+##      AIC     AICc      BIC 
+## 1244.458 1250.511 1296.348 
+## 
+## Error measures:
+##                    ME     RMSE      MAE       MPE     MAPE      MASE
+## Training set 1.511141 9.353686 6.980909 0.4422335 2.761156 0.2292581
+##                   ACF1
+## Training set 0.0457192
+## 
+## Forecasts:
+##          Point Forecast    Lo 80    Hi 80    Lo 95    Hi 95
+## Jan 1960       411.9115 391.9778 431.8452 381.4255 442.3974
+## Feb 1960       406.9694 382.0344 431.9043 368.8346 445.1041
+## Mar 1960       467.3486 433.5448 501.1524 415.6501 519.0470
+## Apr 1960       450.7386 413.6375 487.8397 393.9974 507.4798
+## May 1960       451.5327 410.1879 492.8776 388.3012 514.7642
+## Jun 1960       513.2314 461.7576 564.7052 434.5091 591.9538
+## Jul 1960       569.8868 507.9846 631.7890 475.2156 664.5580
+## Aug 1960       567.5873 501.3865 633.7882 466.3419 668.8328
+## Sep 1960       496.1471 434.4291 557.8652 401.7575 590.5368
+## Oct 1960       432.2153 375.1873 489.2432 344.9985 519.4320
+## Nov 1960       376.6263 324.1565 429.0961 296.3807 456.8719
+## Dec 1960       424.7869 362.5403 487.0334 329.5889 519.9848</code></pre>
+<pre class="r"><code>autoplot(pronostico.ets) +
+  ggtitle(&quot;Mejor pronóstico usando ETS&quot;)</code></pre>
+<p><img src="exposmooth_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+</div>
+<div id="section-5" class="section level2">
+<h2></h2>
+</div>
+<div id="evaluacion-del-pronostico" class="section level2">
+<h2>3. Evaluación del pronóstico</h2>
+</div>
+<div id="section-6" class="section level2">
+<h2></h2>
+<pre class="r"><code>mae.ets &lt;- Metrics::mae(datos.test, pronostico.ets$mean)
+mse.ets &lt;- Metrics::mse(datos.test, pronostico.ets$mean)
+errores.ets &lt;- c(mae.ets, mse.ets)
+errores.ets &lt;- matrix(errores.ets, 1, 2)
+colnames(errores.ets) &lt;- c(&quot;MAE&quot;, &quot;MSE&quot;)
+rownames(errores.ets) &lt;- &quot;Mejor ETS&quot;
+knitr::kable(errores.ets)</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th></th>
+<th align="right">MAE</th>
+<th align="right">MSE</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Mejor ETS</td>
+<td align="right">22.8045</td>
+<td align="right">750.6526</td>
+</tr>
+</tbody>
+</table>
+</div>
 
 
 

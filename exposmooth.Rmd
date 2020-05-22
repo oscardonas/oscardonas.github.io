@@ -1,0 +1,47 @@
+---
+title: "Suavización exponencial"
+---
+
+##  
+## 1. Suavización exponencial usando ETS
+##  
+
+Este es el mejor modelo de suavización exponencial recomendado por el método ETS, que toma como criterio el AICc para discriminar entre varios modelos:
+
+####  
+
+```{r}
+a <- ets(datos.training)
+a
+summary(a)
+```
+
+##  
+## 2. Cálculo del pronóstico
+## 
+
+```{r}
+pronostico.ets <- forecast(ets(datos.training), h = 12)
+pronostico.ets
+summary(pronostico.ets)
+autoplot(pronostico.ets) +
+  ggtitle("Mejor pronóstico usando ETS")
+
+```
+
+##  
+## 3. Evaluación del pronóstico
+## 
+
+```{r}
+mae.ets <- Metrics::mae(datos.test, pronostico.ets$mean)
+mse.ets <- Metrics::mse(datos.test, pronostico.ets$mean)
+errores.ets <- c(mae.ets, mse.ets)
+errores.ets <- matrix(errores.ets, 1, 2)
+colnames(errores.ets) <- c("MAE", "MSE")
+rownames(errores.ets) <- "Mejor ETS"
+knitr::kable(errores.ets)
+
+```
+
+

@@ -2,39 +2,47 @@
 title: "Descomposición estacional"
 ---
 
+##  
+## 1. Descomposición usando STL
+##  
+
 Esta es la descomposición de la serie usando STL, aislando el componente estacional y dejando aparte el componente de tendencia ciclo para ser usado como base para realizar el pronóstico:  
 
 
 ```{r}
-a <- forecast::mstl(AirPassengers)
+a <- forecast::mstl(datos.training)
 head(a, 10)
-autoplot(mstl(AirPassengers)) +
+autoplot(mstl(datos.training)) +
   ggtitle("Descomposicion de la serie de Air Passangers")
 
 ```
 
-Y el pronóstico para los próximos cuatro períodos usando los diferentes métodos  sería:
+##   
+## 2. Cálculo del pronóstico 
+##  
+
+Y el pronóstico para el siguiente año usando los diferentes métodos  sería:
 
 ```{r}
 library(gridExtra)
-pronostico.stl1 <- stlf(ausbeer, method = "naive", h = 4)
+pronostico.stl1 <- stlf(datos.training, method = "naive", h = 12)
 pronostico.stl1
-g1 <- autoplot(pronostico.stl1) + ggtitle("Método naive")
+g1 <- autoplot(pronostico.stl1) + ggtitle("Método Naive")
 g1
 pronostico.stl1$mean
 
 
-pronostico.stl2 <- stlf(ausbeer, method = "ets", h = 4)
+pronostico.stl2 <- stlf(datos.training, method = "ets", h = 12)
 pronostico.stl2
 g2 <- autoplot(pronostico.stl1) + ggtitle("Método ETS")
 g2
 
-pronostico.stl3 <- stlf(ausbeer, method = "arima", h = 4)
+pronostico.stl3 <- stlf(datos.training, method = "arima", h = 12)
 pronostico.stl3
 g3 <- autoplot(pronostico.stl1) + ggtitle("Método ARIMA")
 g3
 
-pronostico.stl4 <- stlf(ausbeer, method = "rwdrift", h = 4)
+pronostico.stl4 <- stlf(datos.training, method = "rwdrift", h = 12)
 pronostico.stl4
 g4 <- autoplot(pronostico.stl1) + ggtitle("Método rwdrift")
 g4
@@ -43,6 +51,69 @@ grid.arrange(g1, g2, g3, g4, nrow = 2, ncol = 2)
 
 ```
 
+##   
+## 3. Evaluación de los pronósicos calculados 
+## 
 
+#### Evaluación de pronóstico con método Naive
+####   
+
+```{r}
+mae.stl1 <- Metrics::mae(datos.test, pronostico.stl1$mean)
+mse.stl1 <- Metrics::mse(datos.test, pronostico.stl1$mean)
+errores.stl1 <- c(mae.stl1, mse.stl1)
+
+```
+
+####  
+#### Evaluación de pronóstico con método ETS
+####   
+
+```{r}
+mae.stl2 <- Metrics::mae(datos.test, pronostico.stl2$mean)
+mse.stl2 <- Metrics::mse(datos.test, pronostico.stl2$mean)
+errores.stl2 <- c(mae.stl2, mse.stl2)
+
+```
+
+####  
+#### Evaluación de pronóstico con método ARIMA
+####   
+
+```{r}
+mae.stl3 <- Metrics::mae(datos.test, pronostico.stl3$mean)
+mse.stl3 <- Metrics::mse(datos.test, pronostico.stl3$mean)
+errores.stl3 <- c(mae.stl3, mse.stl3)
+
+```
+
+####  
+#### Evaluación de pronóstico con método rwdrift
+####   
+
+```{r}
+mae.stl4 <- Metrics::mae(datos.test, pronostico.stl4$mean)
+mse.stl4 <- Metrics::mse(datos.test, pronostico.stl4$mean)
+errores.stl4 <- c(mae.stl4, mse.stl4)
+
+```
+
+####   
+#### Resumen de errores
+####  
+
+```{r}
+errores.stl <- rbind(errores.stl1, errores.stl2,
+                     errores.stl3, errores.stl4)
+colnames(errores.stl) <- c("MAE", "MSE")
+rownames(errores.stl) <- c("Naive", "ETC", "ARIMA",        "rwdrift")
+knitr::kable(errores.stl)
+```
+
+##   
+## 4. Recomendación
+##  
+
+Con base en los errores del pronóstico, se recomienda utilizar el pronóstico generado con el método ARIMA.
 
 

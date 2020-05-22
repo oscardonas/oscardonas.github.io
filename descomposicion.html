@@ -321,70 +321,231 @@ $(document).ready(function () {
 </div>
 
 
+<div id="section" class="section level2">
+<h2></h2>
+</div>
+<div id="descomposicion-usando-stl" class="section level2">
+<h2>1. Descomposición usando STL</h2>
+</div>
+<div id="section-1" class="section level2">
+<h2></h2>
 <p>Esta es la descomposición de la serie usando STL, aislando el componente estacional y dejando aparte el componente de tendencia ciclo para ser usado como base para realizar el pronóstico:</p>
-<pre class="r"><code>a &lt;- forecast::mstl(AirPassengers)
+<pre class="r"><code>a &lt;- forecast::mstl(datos.training)
 head(a, 10)</code></pre>
 <pre><code>##          Data    Trend Seasonal12   Remainder
-## Jan 1949  112 123.2952 -17.896297   6.6010511
-## Feb 1949  118 123.8486 -19.246351  13.3977627
-## Mar 1949  132 124.4019   6.740732   0.8573375
-## Apr 1949  129 124.9553  -1.938243   5.9829703
-## May 1949  121 125.6700  -4.047702  -0.6223200
-## Jun 1949  135 126.3848  20.761163 -12.1459342
-## Jul 1949  148 127.0995  44.083242 -23.1827623
-## Aug 1949  148 127.6714  42.033144 -21.7045666
-## Sep 1949  136 128.2433  12.027560  -4.2708835
-## Oct 1949  119 128.8152 -17.128349   7.3131236</code></pre>
-<pre class="r"><code>autoplot(mstl(AirPassengers)) +
+## Jan 1949  112 123.3204 -17.922141   6.6017740
+## Feb 1949  118 123.8702 -19.278996  13.4088080
+## Mar 1949  132 124.4200   6.701286   0.8787052
+## Apr 1949  129 124.9698  -1.984488   6.0146574
+## May 1949  121 125.6822  -4.074851  -0.6073337
+## Jun 1949  135 126.3945  20.753114 -12.1476516
+## Jul 1949  148 127.1069  44.094292 -23.2011835
+## Aug 1949  148 127.6769  42.060300 -21.7372203
+## Sep 1949  136 128.2469  12.070822  -4.3177697
+## Oct 1949  119 128.8170 -17.068969   7.2519926</code></pre>
+<pre class="r"><code>autoplot(mstl(datos.training)) +
   ggtitle(&quot;Descomposicion de la serie de Air Passangers&quot;)</code></pre>
 <p><img src="descomposicion_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
-<p>Y el pronóstico para los próximos cuatro períodos usando los diferentes métodos estaría sería:</p>
-<pre class="r"><code>pronostico.stl1 &lt;- stlf(ausbeer, method = &quot;naive&quot;, h = 4)
+</div>
+<div id="section-2" class="section level2">
+<h2></h2>
+</div>
+<div id="calculo-del-pronostico" class="section level2">
+<h2>2. Cálculo del pronóstico</h2>
+</div>
+<div id="section-3" class="section level2">
+<h2></h2>
+<p>Y el pronóstico para el siguiente año usando los diferentes métodos sería:</p>
+<pre class="r"><code>library(gridExtra)
+pronostico.stl1 &lt;- stlf(datos.training, method = &quot;naive&quot;, h = 12)
 pronostico.stl1</code></pre>
-<pre><code>##         Point Forecast    Lo 80    Hi 80    Lo 95    Hi 95
-## 2010 Q3       392.5554 369.7048 415.4060 357.6085 427.5023
-## 2010 Q4       468.2816 435.9660 500.5972 418.8592 517.7041
-## 2011 Q1       409.1816 369.6032 448.7599 348.6517 469.7114
-## 2011 Q2       374.0000 328.2989 419.7011 304.1061 443.8939</code></pre>
-<pre class="r"><code>g1 &lt;- autoplot(pronostico.stl1) + ggtitle(&quot;Método naive&quot;)
+<pre><code>##          Point Forecast    Lo 80    Hi 80    Lo 95    Hi 95
+## Jan 1960       413.9051 399.8575 427.9527 392.4211 435.3891
+## Feb 1960       400.1581 380.2918 420.0245 369.7752 430.5411
+## Mar 1960       441.0072 416.6760 465.3384 403.7959 478.2185
+## Apr 1960       430.8419 402.7467 458.9371 387.8740 473.8098
+## May 1960       436.2202 404.8088 467.6316 388.1806 484.2598
+## Jun 1960       481.6405 447.2310 516.0500 429.0157 534.2652
+## Jul 1960       523.5340 486.3675 560.7005 466.6927 580.3752
+## Aug 1960       521.9443 482.2116 561.6770 461.1785 582.7101
+## Sep 1960       460.9660 418.8232 503.1089 396.5141 525.4179
+## Oct 1960       416.2471 371.8246 460.6696 348.3088 484.1854
+## Nov 1960       376.5605 329.9699 423.1512 305.3063 447.8148
+## Dec 1960       405.0000 356.3376 453.6624 330.5773 479.4227</code></pre>
+<pre class="r"><code>g1 &lt;- autoplot(pronostico.stl1) + ggtitle(&quot;Método Naive&quot;)
 g1</code></pre>
 <p><img src="descomposicion_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
 <pre class="r"><code>pronostico.stl1$mean</code></pre>
-<pre><code>##          Qtr1     Qtr2     Qtr3     Qtr4
-## 2010                   392.5554 468.2816
-## 2011 409.1816 374.0000</code></pre>
-<pre class="r"><code>pronostico.stl2 &lt;- stlf(ausbeer, method = &quot;ets&quot;, h = 4)
+<pre><code>##           Jan      Feb      Mar      Apr      May      Jun      Jul
+## 1960 413.9051 400.1581 441.0072 430.8419 436.2202 481.6405 523.5340
+##           Aug      Sep      Oct      Nov      Dec
+## 1960 521.9443 460.9660 416.2471 376.5605 405.0000</code></pre>
+<pre class="r"><code>pronostico.stl2 &lt;- stlf(datos.training, method = &quot;ets&quot;, h = 12)
 pronostico.stl2</code></pre>
-<pre><code>##         Point Forecast    Lo 80    Hi 80    Lo 95    Hi 95
-## 2010 Q3       404.8736 387.5026 422.2445 378.3070 431.4401
-## 2010 Q4       480.0342 461.9966 498.0719 452.4481 507.6204
-## 2011 Q1       420.3933 401.4782 439.3083 391.4651 449.3214
-## 2011 Q2       384.6943 364.6970 404.6916 354.1111 415.2776</code></pre>
+<pre><code>##          Point Forecast    Lo 80    Hi 80    Lo 95    Hi 95
+## Jan 1960       416.2754 402.4012 430.1497 395.0566 437.4943
+## Feb 1960       404.9001 385.2790 424.5212 374.8921 434.9080
+## Mar 1960       448.1208 424.0891 472.1524 411.3675 484.8740
+## Apr 1960       440.3271 412.5766 468.0776 397.8863 482.7679
+## May 1960       448.0770 417.0496 479.1044 400.6246 495.5294
+## Jun 1960       495.8689 461.8784 529.8593 443.8850 547.8528
+## Jul 1960       540.1340 503.4184 576.8496 483.9823 596.2857
+## Aug 1960       540.9159 501.6634 580.1685 480.8844 600.9475
+## Sep 1960       482.3093 440.6737 523.9449 418.6331 545.9855
+## Oct 1960       439.9620 396.0720 483.8519 372.8381 507.0858
+## Nov 1960       402.6470 356.6126 448.6814 332.2435 473.0506
+## Dec 1960       433.4581 385.3744 481.5419 359.9204 506.9959</code></pre>
 <pre class="r"><code>g2 &lt;- autoplot(pronostico.stl1) + ggtitle(&quot;Método ETS&quot;)
 g2</code></pre>
 <p><img src="descomposicion_files/figure-html/unnamed-chunk-2-2.png" width="672" /></p>
-<pre class="r"><code>pronostico.stl3 &lt;- stlf(ausbeer, method = &quot;arima&quot;, h = 4)
+<pre class="r"><code>pronostico.stl3 &lt;- stlf(datos.training, method = &quot;arima&quot;, h = 12)
 pronostico.stl3</code></pre>
-<pre><code>##         Point Forecast    Lo 80    Hi 80    Lo 95    Hi 95
-## 2010 Q3       406.0667 388.9104 423.2230 379.8284 432.3051
-## 2010 Q4       474.8099 457.4317 492.1881 448.2322 501.3875
-## 2011 Q1       414.3396 395.3317 433.3475 385.2696 443.4097
-## 2011 Q2       379.2981 358.2553 400.3409 347.1159 411.4803</code></pre>
+<pre><code>##          Point Forecast    Lo 80    Hi 80    Lo 95    Hi 95
+## Jan 1960       411.9351 399.3201 424.5502 392.6420 431.2283
+## Feb 1960       404.0608 387.7830 420.3387 379.1661 428.9556
+## Mar 1960       454.1068 435.2812 472.9324 425.3155 482.8980
+## Apr 1960       455.2411 434.8081 475.6741 423.9915 486.4907
+## May 1960       471.7131 450.2712 493.1551 438.9205 504.5058
+## Jun 1960       525.9285 503.8104 548.0466 492.1018 559.7552
+## Jul 1960       572.8476 550.1742 595.5210 538.1716 607.5235
+## Aug 1960       572.0259 548.7485 595.3034 536.4261 607.6257
+## Sep 1960       508.1405 484.0570 532.2240 471.3080 544.9730
+## Oct 1960       458.3142 433.0983 483.5301 419.7498 496.8786
+## Nov 1960       413.2938 386.5812 440.0064 372.4405 454.1471
+## Dec 1960       438.1404 409.6607 466.6200 394.5845 481.6962</code></pre>
 <pre class="r"><code>g3 &lt;- autoplot(pronostico.stl1) + ggtitle(&quot;Método ARIMA&quot;)
 g3</code></pre>
 <p><img src="descomposicion_files/figure-html/unnamed-chunk-2-3.png" width="672" /></p>
-<pre class="r"><code>pronostico.stl4 &lt;- stlf(ausbeer, method = &quot;rwdrift&quot;, h = 4)
+<pre class="r"><code>pronostico.stl4 &lt;- stlf(datos.training, method = &quot;rwdrift&quot;, h = 12)
 pronostico.stl4</code></pre>
-<pre><code>##         Point Forecast    Lo 80    Hi 80    Lo 95    Hi 95
-## 2010 Q3       393.1792 370.2372 416.1213 358.0924 428.2661
-## 2010 Q4       469.5293 436.9358 502.1228 419.6819 519.3767
-## 2011 Q1       411.0531 370.9534 451.1528 349.7258 472.3803
-## 2011 Q2       376.4953 329.9841 423.0066 305.3625 447.6282</code></pre>
+<pre><code>##          Point Forecast    Lo 80    Hi 80    Lo 95    Hi 95
+## Jan 1960       416.2897 402.4734 430.1059 395.1595 437.4198
+## Feb 1960       404.9273 385.2407 424.6139 374.8192 435.0353
+## Mar 1960       448.1609 423.8706 472.4512 411.0120 485.3098
+## Apr 1960       440.3802 412.1266 468.6337 397.1701 483.5903
+## May 1960       448.1431 416.3266 479.9596 399.4839 496.8022
+## Jun 1960       495.9479 460.8466 531.0492 442.2651 549.6307
+## Jul 1960       540.2260 502.0462 578.4058 481.8350 598.6169
+## Aug 1960       541.0209 499.9225 582.1193 478.1663 603.8754
+## Sep 1960       482.4272 438.5382 526.3161 415.3048 549.5496
+## Oct 1960       440.0928 393.5182 486.6674 368.8631 511.3225
+## Nov 1960       402.7908 353.6184 451.9632 327.5881 477.9935
+## Dec 1960       433.6148 381.9192 485.3105 354.5531 512.6766</code></pre>
 <pre class="r"><code>g4 &lt;- autoplot(pronostico.stl1) + ggtitle(&quot;Método rwdrift&quot;)
 g4</code></pre>
 <p><img src="descomposicion_files/figure-html/unnamed-chunk-2-4.png" width="672" /></p>
-<pre class="r"><code>grid.arrange(g1, g2, g3, g4, nrow = 2, ncol = 2) #Calcular errores</code></pre>
+<pre class="r"><code>grid.arrange(g1, g2, g3, g4, nrow = 2, ncol = 2)</code></pre>
 <p><img src="descomposicion_files/figure-html/unnamed-chunk-2-5.png" width="672" /></p>
+</div>
+<div id="section-4" class="section level2">
+<h2></h2>
+</div>
+<div id="evaluacion-de-los-pronosicos-calculados" class="section level2">
+<h2>3. Evaluación de los pronósicos calculados</h2>
+</div>
+<div id="section-5" class="section level2">
+<h2></h2>
+<div id="evaluacion-de-pronostico-con-metodo-naive" class="section level4">
+<h4>Evaluación de pronóstico con método Naive</h4>
+</div>
+<div id="section-6" class="section level4">
+<h4></h4>
+<pre class="r"><code>mae.stl1 &lt;- Metrics::mae(datos.test, pronostico.stl1$mean)
+mse.stl1 &lt;- Metrics::mse(datos.test, pronostico.stl1$mean)
+errores.stl1 &lt;- c(mae.stl1, mse.stl1)</code></pre>
+</div>
+<div id="section-7" class="section level4">
+<h4></h4>
+</div>
+<div id="evaluacion-de-pronostico-con-metodo-ets" class="section level4">
+<h4>Evaluación de pronóstico con método ETS</h4>
+</div>
+<div id="section-8" class="section level4">
+<h4></h4>
+<pre class="r"><code>mae.stl2 &lt;- Metrics::mae(datos.test, pronostico.stl2$mean)
+mse.stl2 &lt;- Metrics::mse(datos.test, pronostico.stl2$mean)
+errores.stl2 &lt;- c(mae.stl2, mse.stl2)</code></pre>
+</div>
+<div id="section-9" class="section level4">
+<h4></h4>
+</div>
+<div id="evaluacion-de-pronostico-con-metodo-arima" class="section level4">
+<h4>Evaluación de pronóstico con método ARIMA</h4>
+</div>
+<div id="section-10" class="section level4">
+<h4></h4>
+<pre class="r"><code>mae.stl3 &lt;- Metrics::mae(datos.test, pronostico.stl3$mean)
+mse.stl3 &lt;- Metrics::mse(datos.test, pronostico.stl3$mean)
+errores.stl3 &lt;- c(mae.stl3, mse.stl3)</code></pre>
+</div>
+<div id="section-11" class="section level4">
+<h4></h4>
+</div>
+<div id="evaluacion-de-pronostico-con-metodo-rwdrift" class="section level4">
+<h4>Evaluación de pronóstico con método rwdrift</h4>
+</div>
+<div id="section-12" class="section level4">
+<h4></h4>
+<pre class="r"><code>mae.stl4 &lt;- Metrics::mae(datos.test, pronostico.stl4$mean)
+mse.stl4 &lt;- Metrics::mse(datos.test, pronostico.stl4$mean)
+errores.stl4 &lt;- c(mae.stl4, mse.stl4)</code></pre>
+</div>
+<div id="section-13" class="section level4">
+<h4></h4>
+</div>
+<div id="resumen-de-errores" class="section level4">
+<h4>Resumen de errores</h4>
+</div>
+<div id="section-14" class="section level4">
+<h4></h4>
+<pre class="r"><code>errores.stl &lt;- rbind(errores.stl1, errores.stl2,
+                     errores.stl3, errores.stl4)
+colnames(errores.stl) &lt;- c(&quot;MAE&quot;, &quot;MSE&quot;)
+rownames(errores.stl) &lt;- c(&quot;Naive&quot;, &quot;ETC&quot;, &quot;ARIMA&quot;,        &quot;rwdrift&quot;)
+knitr::kable(errores.stl)</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th></th>
+<th align="right">MAE</th>
+<th align="right">MSE</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Naive</td>
+<td align="right">39.02548</td>
+<td align="right">2291.6888</td>
+</tr>
+<tr class="even">
+<td>ETC</td>
+<td align="right">27.93803</td>
+<td align="right">1314.6115</td>
+</tr>
+<tr class="odd">
+<td>ARIMA</td>
+<td align="right">15.31139</td>
+<td align="right">475.1667</td>
+</tr>
+<tr class="even">
+<td>rwdrift</td>
+<td align="right">27.91385</td>
+<td align="right">1310.9002</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="section-15" class="section level2">
+<h2></h2>
+</div>
+<div id="recomendacion" class="section level2">
+<h2>4. Recomendación</h2>
+</div>
+<div id="section-16" class="section level2">
+<h2></h2>
+<p>Con base en los errores del pronóstico, se recomienda utilizar el pronóstico generado con el método ARIMA.</p>
+</div>
 
 
 

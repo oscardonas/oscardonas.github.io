@@ -321,6 +321,14 @@ $(document).ready(function () {
 </div>
 
 
+<div id="section" class="section level2">
+<h2></h2>
+</div>
+<div id="analisis-descriptivo-de-la-serie" class="section level2">
+<h2>1. Análisis descriptivo de la serie</h2>
+</div>
+<div id="section-1" class="section level2">
+<h2></h2>
 <p>Esta serie detalla los miles de pasajeros que han volado a nivel mundial en el período indicado</p>
 <pre class="r"><code>library(fpp2)
 AirPassengers</code></pre>
@@ -340,17 +348,99 @@ AirPassengers</code></pre>
 <pre class="r"><code>autoplot(AirPassengers) +
   ggtitle(&quot;Monthly Airline Passenger Numbers 1949-1960&quot;)</code></pre>
 <p><img src="analisis_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
-<p>Análisis de componentes presentes en la serie.</p>
+<pre class="r"><code>library(summarytools)
+library(knitr)
+kable(descr(AirPassengers), caption = &quot;Resumen de estadísticos descriptivos&quot;)</code></pre>
+<table>
+<caption>Resumen de estadísticos descriptivos</caption>
+<thead>
+<tr class="header">
+<th></th>
+<th align="right">x</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Mean</td>
+<td align="right">280.2986111</td>
+</tr>
+<tr class="even">
+<td>Std.Dev</td>
+<td align="right">119.9663169</td>
+</tr>
+<tr class="odd">
+<td>Min</td>
+<td align="right">104.0000000</td>
+</tr>
+<tr class="even">
+<td>Q1</td>
+<td align="right">180.0000000</td>
+</tr>
+<tr class="odd">
+<td>Median</td>
+<td align="right">265.5000000</td>
+</tr>
+<tr class="even">
+<td>Q3</td>
+<td align="right">361.0000000</td>
+</tr>
+<tr class="odd">
+<td>Max</td>
+<td align="right">622.0000000</td>
+</tr>
+<tr class="even">
+<td>MAD</td>
+<td align="right">133.4340000</td>
+</tr>
+<tr class="odd">
+<td>IQR</td>
+<td align="right">180.5000000</td>
+</tr>
+<tr class="even">
+<td>CV</td>
+<td align="right">0.4279947</td>
+</tr>
+<tr class="odd">
+<td>Skewness</td>
+<td align="right">0.5710676</td>
+</tr>
+<tr class="even">
+<td>SE.Skewness</td>
+<td align="right">0.2020403</td>
+</tr>
+<tr class="odd">
+<td>Kurtosis</td>
+<td align="right">-0.4298441</td>
+</tr>
+<tr class="even">
+<td>N.Valid</td>
+<td align="right">144.0000000</td>
+</tr>
+<tr class="odd">
+<td>Pct.Valid</td>
+<td align="right">100.0000000</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="section-2" class="section level2">
+<h2></h2>
+</div>
+<div id="analisis-de-componentes-presentes-en-la-serie" class="section level2">
+<h2>2. Análisis de componentes presentes en la serie</h2>
+</div>
+<div id="section-3" class="section level2">
+<h2></h2>
 <p>Autocorrelogramas</p>
 <pre class="r"><code>ggtsdisplay(AirPassengers)</code></pre>
-<p><img src="analisis_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<p><img src="analisis_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
 <p>Gráficos de estacionalidad</p>
 <pre class="r"><code>forecast::ggseasonplot(AirPassengers)</code></pre>
-<p><img src="analisis_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<p><img src="analisis_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
 <pre class="r"><code>forecast::ggseasonplot(AirPassengers, polar = TRUE)</code></pre>
-<p><img src="analisis_files/figure-html/unnamed-chunk-3-2.png" width="672" /></p>
+<p><img src="analisis_files/figure-html/unnamed-chunk-4-2.png" width="672" /></p>
 <pre class="r"><code>forecast::ggsubseriesplot(AirPassengers)</code></pre>
-<p><img src="analisis_files/figure-html/unnamed-chunk-3-3.png" width="672" /></p>
+<p><img src="analisis_files/figure-html/unnamed-chunk-4-3.png" width="672" /></p>
 <p>Pruebas analíticas para determinar presencia de tendencia y estacionalidad: test de Cox-Stuart y test de Friedman.</p>
 <pre class="r"><code>library(randtests)
 randtests::cox.stuart.test(AirPassengers)</code></pre>
@@ -366,6 +456,45 @@ seastests::fried(AirPassengers)</code></pre>
 ##  
 ## Test statistic:  106.68 
 ## P-value:  0</code></pre>
+<ol style="list-style-type: decimal">
+<li>El análisis del gráfico secuencial de la serie muestra la presencia tanto de tendencia como de estacionalidad.</li>
+<li>El análisis del ACF también indica la existencia de tendencia marcada (por la caída suave de los coeficientes de correlación significativos) y de estacionalidad (porque el coeficiente de correlación #12 es significativo).</li>
+<li>El resultado de la prueba de Cox-Stuart permite concluir que existe tendencia y el resultado de la prueba de Friedman lleva a concluir que hay estacionalidad (en ambos casos se rechaza la hipótesis nula según la cual el componente no está presente).</li>
+</ol>
+</div>
+<div id="section-4" class="section level2">
+<h2></h2>
+</div>
+<div id="separacion-de-datos-de-entrenamiento-y-de-prueba" class="section level2">
+<h2>3. Separación de datos de entrenamiento y de prueba</h2>
+</div>
+<div id="section-5" class="section level2">
+<h2></h2>
+<pre class="r"><code>datos.training &lt;- window(AirPassengers, end = c(1959, 12))
+datos.test     &lt;- window(AirPassengers, start = c(1960, 1))</code></pre>
+<div id="datos-de-entrenamiento-para-construir-los-modelos" class="section level4">
+<h4>Datos de entrenamiento para construir los modelos</h4>
+<pre class="r"><code>datos.training</code></pre>
+<pre><code>##      Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec
+## 1949 112 118 132 129 121 135 148 148 136 119 104 118
+## 1950 115 126 141 135 125 149 170 170 158 133 114 140
+## 1951 145 150 178 163 172 178 199 199 184 162 146 166
+## 1952 171 180 193 181 183 218 230 242 209 191 172 194
+## 1953 196 196 236 235 229 243 264 272 237 211 180 201
+## 1954 204 188 235 227 234 264 302 293 259 229 203 229
+## 1955 242 233 267 269 270 315 364 347 312 274 237 278
+## 1956 284 277 317 313 318 374 413 405 355 306 271 306
+## 1957 315 301 356 348 355 422 465 467 404 347 305 336
+## 1958 340 318 362 348 363 435 491 505 404 359 310 337
+## 1959 360 342 406 396 420 472 548 559 463 407 362 405</code></pre>
+</div>
+<div id="datosde-prueba-para-calcular-el-error-del-pronostico" class="section level4">
+<h4>Datosde prueba para calcular el error del pronóstico</h4>
+<pre class="r"><code>datos.test</code></pre>
+<pre><code>##      Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec
+## 1960 417 391 419 461 472 535 622 606 508 461 390 432</code></pre>
+</div>
+</div>
 
 
 
