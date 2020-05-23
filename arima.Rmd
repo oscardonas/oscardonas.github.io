@@ -1,0 +1,94 @@
+---
+title: "ARIMA"
+---
+
+##  
+## 1. Validación de estacionariedad
+##  
+
+Cuando se realizó el análisis de serie, se concluyó que ésta tenía componentes de tendencia y estacionalidad. Por tanto, la serie no es estacionaria, por lo que no se puede aplicar la técnica ARIMA sin lograr previamente la estacionariedad. La no existencia de estacionariedad se confirmará con la prueba KPSS.
+
+```{r}
+tseries::kpss.test(datos.training)
+```
+
+####   
+La hipótesis nula de esta prueba es la existencia de estacionariedad. En este caso, dado que el p-Value es menor que 0.05, se tiene suficiente evidencia para rechazar la hipótesis nula y, por tanto, se confirma que la serie no es estacionaria.
+
+####
+
+Del análisis de la serie también se observó que el componete estacional no era uniforme, sino que se acentuaba a medida que avanzaba en el tiempo. Por tanto, para regularizar (uniformizar) la magnitud de la estacionalidad, será necesario aplicar una transformación a la serie.
+
+##  
+## 2. Transformación y diferenciación de la serie
+## 
+
+```{r}
+l.datos.training <- log(datos.training)
+panel.datos <- cbind("Serie original" = datos.training, "Transformación Log" = l.datos.training)
+autoplot(panel.datos, facets = TRUE)
+
+```
+####  
+
+El gráfico anterior confirma que se cumplió el objetivo de regularizar la amplitud de la estacionalidad a través del toda la serie.
+
+####
+
+```{r}
+forecast::ndiffs(l.datos.training)
+forecast::nsdiffs(l.datos.training)
+
+```
+
+
+
+```{r}
+datos.diferenciados <- diff(diff(l.datos.training,12))
+tseries::kpss.test(datos.diferenciados)
+```
+
+####   
+
+El resultado de la prueba KPSS a la serie diferenciada regular y estacionalmente confirma que se ha conseguido estacionariedad, por lo que se puede proceder a aplicar la técnica ARIMA.
+
+##  
+## 3. Construcción de los modelos
+##  
+
+```{r}
+ggtsdisplay(datos.diferenciados)
+```
+
+####   
+
+El análisis de los autocorrelogramas construidos sobre la serie transformada y estacionaria sugiere que se puede partir de un modelo ARIMA(1,1,1)(1,1,1). Recuérdese que las diferenciaciones regulaes y estacionales no se saca de la lectura de los autocorrelogramas, sino de la necesidad de haber diferenciado la serie para hacerla estacionaria.
+
+####   
+
+```{r}
+arima1 <- forecast::Arima(l.datos.training, order = c(1,1,1), seasonal = c(1,1,1))
+arima1
+forecast::checkresiduals(arima1)
+
+```
+
+####   
+
+El modelo arroja un AICc = -437.16. Además, no es posible rechazar la hipótesis nula en la prueba checkresiduals según la cual los residuos son ruido blanco. Por tanto, este es un buen modelo.
+
+####  
+
+```{r}
+arima.automatico <- auto.arima(l.datos.training, stepwise = FALSE, approximation = FALSE, trace = FALSE)
+arima.automatico
+forecast::checkresiduals(arima.automatico)
+```
+
+####   
+
+La recomendación de auto.arima proporciona un modelo ligeramente mejor al construido por nosotros (AICc = -441.05) y la prueba de los residuos nos confirma que son ruido blanco. Por tanto, el model a ocupar sería ARIMA(0,1,1)(0,1,1).
+
+##  
+## 4. Cálculo del error del pronóstico
+## 

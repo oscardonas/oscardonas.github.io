@@ -11,7 +11,7 @@
 
 
 
-<title>arima.utf8.md</title>
+<title>ARIMA</title>
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -316,11 +316,151 @@ $(document).ready(function () {
 
 
 
+<h1 class="title toc-ignore">ARIMA</h1>
 
 </div>
 
 
-
+<div id="section" class="section level2">
+<h2></h2>
+</div>
+<div id="validacion-de-estacionariedad" class="section level2">
+<h2>1. Validación de estacionariedad</h2>
+</div>
+<div id="section-1" class="section level2">
+<h2></h2>
+<p>Cuando se realizó el análisis de serie, se concluyó que ésta tenía componentes de tendencia y estacionalidad. Por tanto, la serie no es estacionaria, por lo que no se puede aplicar la técnica ARIMA sin lograr previamente la estacionariedad. La no existencia de estacionariedad se confirmará con la prueba KPSS.</p>
+<pre class="r"><code>tseries::kpss.test(datos.training)</code></pre>
+<pre><code>## Warning in tseries::kpss.test(datos.training): p-value smaller than printed
+## p-value</code></pre>
+<pre><code>## 
+##  KPSS Test for Level Stationarity
+## 
+## data:  datos.training
+## KPSS Level = 2.5186, Truncation lag parameter = 4, p-value = 0.01</code></pre>
+<div id="section-2" class="section level4">
+<h4></h4>
+<p>La hipótesis nula de esta prueba es la existencia de estacionariedad. En este caso, dado que el p-Value es menor que 0.05, se tiene suficiente evidencia para rechazar la hipótesis nula y, por tanto, se confirma que la serie no es estacionaria.</p>
+</div>
+<div id="section-3" class="section level4">
+<h4></h4>
+<p>Del análisis de la serie también se observó que el componete estacional no era uniforme, sino que se acentuaba a medida que avanzaba en el tiempo. Por tanto, para regularizar (uniformizar) la magnitud de la estacionalidad, será necesario aplicar una transformación a la serie.</p>
+</div>
+</div>
+<div id="section-4" class="section level2">
+<h2></h2>
+</div>
+<div id="transformacion-y-diferenciacion-de-la-serie" class="section level2">
+<h2>2. Transformación y diferenciación de la serie</h2>
+</div>
+<div id="section-5" class="section level2">
+<h2></h2>
+<pre class="r"><code>l.datos.training &lt;- log(datos.training)
+panel.datos &lt;- cbind(&quot;Serie original&quot; = datos.training, &quot;Transformación Log&quot; = l.datos.training)
+autoplot(panel.datos, facets = TRUE)</code></pre>
+<p><img src="arima_files/figure-html/unnamed-chunk-2-1.png" width="672" /> ####</p>
+<p>El gráfico anterior confirma que se cumplió el objetivo de regularizar la amplitud de la estacionalidad a través del toda la serie.</p>
+<div id="section-6" class="section level4">
+<h4></h4>
+<pre class="r"><code>forecast::ndiffs(l.datos.training)</code></pre>
+<pre><code>## [1] 1</code></pre>
+<pre class="r"><code>forecast::nsdiffs(l.datos.training)</code></pre>
+<pre><code>## [1] 1</code></pre>
+<pre class="r"><code>datos.diferenciados &lt;- diff(diff(l.datos.training,12))
+tseries::kpss.test(datos.diferenciados)</code></pre>
+<pre><code>## Warning in tseries::kpss.test(datos.diferenciados): p-value greater than
+## printed p-value</code></pre>
+<pre><code>## 
+##  KPSS Test for Level Stationarity
+## 
+## data:  datos.diferenciados
+## KPSS Level = 0.070696, Truncation lag parameter = 4, p-value = 0.1</code></pre>
+</div>
+<div id="section-7" class="section level4">
+<h4></h4>
+<p>El resultado de la prueba KPSS a la serie diferenciada regular y estacionalmente confirma que se ha conseguido estacionariedad, por lo que se puede proceder a aplicar la técnica ARIMA.</p>
+</div>
+</div>
+<div id="section-8" class="section level2">
+<h2></h2>
+</div>
+<div id="construccion-de-los-modelos" class="section level2">
+<h2>3. Construcción de los modelos</h2>
+</div>
+<div id="section-9" class="section level2">
+<h2></h2>
+<pre class="r"><code>ggtsdisplay(datos.diferenciados)</code></pre>
+<p><img src="arima_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<div id="section-10" class="section level4">
+<h4></h4>
+<p>El análisis de los autocorrelogramas construidos sobre la serie transformada y estacionaria sugiera que se puede partir de un modelo ARIMA(1,1,1)(1,1,1). Recuérdese que las diferenciaciones regulaes y estacionales no se saca de la lectura de los autocorrelogramas, sino de la necesidad de haber diferenciado la serie para hacerla estacionaria.</p>
+</div>
+<div id="section-11" class="section level4">
+<h4></h4>
+<pre class="r"><code>arima1 &lt;- forecast::Arima(l.datos.training, order = c(1,1,1), seasonal = c(1,1,1))
+arima1</code></pre>
+<pre><code>## Series: l.datos.training 
+## ARIMA(1,1,1)(1,1,1)[12] 
+## 
+## Coefficients:
+##          ar1      ma1     sar1     sma1
+##       0.1927  -0.5372  -0.0678  -0.5189
+## s.e.  0.3355   0.2981   0.1654   0.1472
+## 
+## sigma^2 estimated as 0.001355:  log likelihood=223.85
+## AIC=-437.69   AICc=-437.16   BIC=-423.79</code></pre>
+<pre class="r"><code>forecast::checkresiduals(arima1)</code></pre>
+<p><img src="arima_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<pre><code>## 
+##  Ljung-Box test
+## 
+## data:  Residuals from ARIMA(1,1,1)(1,1,1)[12]
+## Q* = 20.041, df = 20, p-value = 0.4554
+## 
+## Model df: 4.   Total lags used: 24</code></pre>
+</div>
+<div id="section-12" class="section level4">
+<h4></h4>
+<p>El modelo arroja un AICc = -437.16. Además, no es posible rechazar la hipótesis nula en la prueba checkresiduals según la cual los residuos son ruido blanco. Por tanto, este es un buen modelo.</p>
+</div>
+<div id="section-13" class="section level4">
+<h4></h4>
+<pre class="r"><code>arima.automatico &lt;- auto.arima(l.datos.training, stepwise = FALSE, approximation = FALSE, trace = FALSE)
+arima.automatico</code></pre>
+<pre><code>## Series: l.datos.training 
+## ARIMA(0,1,1)(0,1,1)[12] 
+## 
+## Coefficients:
+##           ma1     sma1
+##       -0.3484  -0.5623
+## s.e.   0.0943   0.0774
+## 
+## sigma^2 estimated as 0.001338:  log likelihood=223.63
+## AIC=-441.26   AICc=-441.05   BIC=-432.92</code></pre>
+<pre class="r"><code>forecast::checkresiduals(arima.automatico)</code></pre>
+<p><img src="arima_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+<pre><code>## 
+##  Ljung-Box test
+## 
+## data:  Residuals from ARIMA(0,1,1)(0,1,1)[12]
+## Q* = 21.011, df = 22, p-value = 0.5201
+## 
+## Model df: 2.   Total lags used: 24</code></pre>
+</div>
+<div id="section-14" class="section level4">
+<h4></h4>
+<p>La recomendación de auto.arima proporciona un modelo ligeramente mejor al construido por nosotros (AICc = -441.05) y la prueba de los residuos nos confirma que son ruido blanco. Por tanto, el model a ocupar sería ARIMA(0,1,1)(0,1,1).</p>
+</div>
+</div>
+<div id="section-15" class="section level2">
+<h2></h2>
+</div>
+<div id="calculo-del-error-del-pronostico" class="section level2">
+<h2>4. Cálculo del error del pronóstico</h2>
+</div>
+<div id="section-16" class="section level2">
+<h2></h2>
+</div>
 
 
 
