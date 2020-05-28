@@ -31,7 +31,7 @@ autoplot(panel.datos, facets = TRUE)
 ```
 ####  
 
-El gráfico anterior confirma que se cumplió el objetivo de regularizar la amplitud de la estacionalidad a través del toda la serie.
+El gráfico anterior confirma que se cumplió el objetivo de regularizar la amplitud de la estacionalidad a través de toda la serie.
 
 ####
 
@@ -41,7 +41,11 @@ forecast::nsdiffs(l.datos.training)
 
 ```
 
+####  
 
+Las funciones ndiffs y nsdiffs nos sugieren diferenciar una vez regualarmente y una vez estacionalmente para lograr estacionariedad.
+
+####
 
 ```{r}
 datos.diferenciados <- diff(diff(l.datos.training,12))
@@ -62,24 +66,37 @@ ggtsdisplay(datos.diferenciados)
 
 ####   
 
-El análisis de los autocorrelogramas construidos sobre la serie transformada y estacionaria sugiere que se puede partir de un modelo ARIMA(1,1,1)(1,1,1). Recuérdese que las diferenciaciones regulaes y estacionales no se saca de la lectura de los autocorrelogramas, sino de la necesidad de haber diferenciado la serie para hacerla estacionaria.
+El análisis de los autocorrelogramas construidos sobre la serie transformada y estacionaria sugiere que se puede partir de un modelo ARIMA(1,1,1)(0,1,0) o ARIMA(1,1,1)(1,1,0) y también es plausible probar un modelo ARIMA(2,1,1)(0,1,0) o ARIMA(2,1,1)(1,1,0) Recuérdese que las diferenciaciones regulares y estacionales no se sacan de la lectura de los autocorrelogramas, sino de la necesidad de haber diferenciado la serie para hacerla estacionaria.
 
 ####   
 
 ```{r}
-arima1 <- forecast::Arima(l.datos.training, order = c(1,1,1), seasonal = c(1,1,1))
+arima1 <- forecast::Arima(l.datos.training, order = c(1,1,1), seasonal = c(0,1,0))
 arima1
 forecast::checkresiduals(arima1)
+
+arima2 <- forecast::Arima(l.datos.training, order = c(1,1,1), seasonal = c(1,1,0))
+arima2
+forecast::checkresiduals(arima2)
+
+arima3 <- forecast::Arima(l.datos.training, order = c(2,1,1), seasonal = c(0,1,0))
+arima3
+forecast::checkresiduals(arima3)
+
+arima4 <- forecast::Arima(l.datos.training, order = c(2,1,1), seasonal = c(1,1,0))
+arima4
+forecast::checkresiduals(arima4)
 
 ```
 
 ####   
 
-El modelo arroja un AICc = -437.16. Además, no es posible rechazar la hipótesis nula en la prueba checkresiduals según la cual los residuos son ruido blanco. Por tanto, este es un buen modelo.
+Los modelos arima1 y arima3 no son válidos, pues los residuos no cumplen con ser ruido blanco. Los modelos arima2 y arima4 sí son válidos pues los residuos son ruido blanco. Entre esos dos, el modelo arima2 es ligeramente mejor al tener un AICc = -138.56.
 
 ####  
 
 ```{r}
+library(forecast)
 arima.automatico <- auto.arima(l.datos.training, stepwise = FALSE, approximation = FALSE, trace = FALSE)
 arima.automatico
 forecast::checkresiduals(arima.automatico)
@@ -87,8 +104,24 @@ forecast::checkresiduals(arima.automatico)
 
 ####   
 
-La recomendación de auto.arima proporciona un modelo ligeramente mejor al construido por nosotros (AICc = -441.05) y la prueba de los residuos nos confirma que son ruido blanco. Por tanto, el model a ocupar sería ARIMA(0,1,1)(0,1,1).
+La recomendación de auto.arima proporciona un modelo mejor al construido por nosotros (AICc = -151.34) y la prueba de los residuos nos confirma que son ruido blanco. Por tanto, el modelo a ocupar sería ARIMA(1,0,0)(1,1,2).
 
 ##  
 ## 4. Cálculo del error del pronóstico
 ## 
+
+```{r}
+l.pronostico.arima <- forecast(arima.automatico, h = 4)
+l.pronostico.arima$mean
+pronostico.arima <- exp(l.pronostico.arima$mean)
+pronostico.arima
+mae.arima <- Metrics::mae(datos.test, pronostico.arima)
+mse.arima <- Metrics::mse(datos.test, pronostico.arima)
+errores.arima <- c(mae.arima, mse.arima)
+errores.arima <- matrix(errores.arima, 1, 2)
+colnames(errores.arima) <- c("MAE", "MSE")
+rownames(errores.arima) <- "Mejor ARIMA"
+knitr::kable(errores.arima)
+
+```
+

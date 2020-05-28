@@ -13,7 +13,7 @@ Esta es la descomposición de la serie usando STL, aislando el componente estaci
 a <- forecast::mstl(datos.training)
 head(a, 10)
 autoplot(mstl(datos.training)) +
-  ggtitle("Descomposicion de la serie de Air Passangers")
+  ggtitle("Descomposicion de la serie de noches de turistas en Australia")
 
 ```
 
@@ -25,24 +25,24 @@ Y el pronóstico para el siguiente año usando los diferentes métodos  sería:
 
 ```{r}
 library(gridExtra)
-pronostico.stl1 <- stlf(datos.training, method = "naive", h = 12)
+pronostico.stl1 <- stlf(datos.training, method = "naive", h = 4)
 pronostico.stl1
 g1 <- autoplot(pronostico.stl1) + ggtitle("Método Naive")
 g1
 pronostico.stl1$mean
 
 
-pronostico.stl2 <- stlf(datos.training, method = "ets", h = 12)
+pronostico.stl2 <- stlf(datos.training, method = "ets", h = 4)
 pronostico.stl2
 g2 <- autoplot(pronostico.stl1) + ggtitle("Método ETS")
 g2
 
-pronostico.stl3 <- stlf(datos.training, method = "arima", h = 12)
+pronostico.stl3 <- stlf(datos.training, method = "arima", h = 4)
 pronostico.stl3
 g3 <- autoplot(pronostico.stl1) + ggtitle("Método ARIMA")
 g3
 
-pronostico.stl4 <- stlf(datos.training, method = "rwdrift", h = 12)
+pronostico.stl4 <- stlf(datos.training, method = "rwdrift", h = 4)
 pronostico.stl4
 g4 <- autoplot(pronostico.stl1) + ggtitle("Método rwdrift")
 g4
@@ -106,7 +106,7 @@ errores.stl4 <- c(mae.stl4, mse.stl4)
 errores.stl <- rbind(errores.stl1, errores.stl2,
                      errores.stl3, errores.stl4)
 colnames(errores.stl) <- c("MAE", "MSE")
-rownames(errores.stl) <- c("Naive", "ETC", "ARIMA",        "rwdrift")
+rownames(errores.stl) <- c("Naive", "ETC", "ARIMA", "rwdrift")
 knitr::kable(errores.stl)
 ```
 
@@ -114,15 +114,15 @@ knitr::kable(errores.stl)
 ## 4. Recomendación
 ##  
 
-Con base en los errores del pronóstico, se recomienda utilizar el pronóstico generado con el método ARIMA.
+Con base en los errores del pronóstico, se recomienda utilizar el pronóstico generado con el método RWDrift.
 
 ##  
 
 ```{r}
-errores.mejor.stl <- errores.stl3
+errores.mejor.stl <- errores.stl4
 errores.mejor.stl <- matrix(errores.mejor.stl, 1, 2)
 colnames(errores.mejor.stl) <- c("MAE", "MSE")
-rownames(errores.mejor.stl) <- "Mejor STL (ARIMA)"
+rownames(errores.mejor.stl) <- "Mejor STL (RWDrift)"
 knitr::kable(errores.mejor.stl)
 
 ```

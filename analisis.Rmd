@@ -10,15 +10,15 @@ Esta serie detalla los miles de pasajeros que han volado a nivel mundial en el p
 
 ```{r}
 library(fpp2)
-AirPassengers
-autoplot(AirPassengers) +
-  ggtitle("Monthly Airline Passenger Numbers 1949-1960")
+datos=austourists
+autoplot(datos) +
+  ggtitle("Noches que los turistas pasan en Australia trimestralmente")
 ```
 
 ```{r}
 library(summarytools)
 library(knitr)
-kable(descr(AirPassengers), caption = "Resumen de estadísticos descriptivos")
+kable(descr(datos), caption = "Resumen de estadísticos descriptivos")
 
 ```
 
@@ -29,30 +29,30 @@ kable(descr(AirPassengers), caption = "Resumen de estadísticos descriptivos")
 Autocorrelogramas
 
 ```{r}
-ggtsdisplay(AirPassengers)
+ggtsdisplay(datos)
 ```
 
 Gráficos de estacionalidad
 
 ```{r}
-forecast::ggseasonplot(AirPassengers)
-forecast::ggseasonplot(AirPassengers, polar = TRUE)
-forecast::ggsubseriesplot(AirPassengers)
+forecast::ggseasonplot(datos)
+forecast::ggseasonplot(datos, polar = TRUE)
+forecast::ggsubseriesplot(datos)
 ```
 
 Pruebas analíticas para determinar presencia de tendencia y estacionalidad: test de Cox-Stuart y test de Friedman.
 
 ```{r}
 library(randtests)
-randtests::cox.stuart.test(AirPassengers)
+randtests::cox.stuart.test(datos)
 library(seastests)
-seastests::fried(AirPassengers)
+seastests::fried(datos)
 ```
 
 
 
 1. El análisis del gráfico secuencial de la serie muestra la presencia tanto de tendencia como de estacionalidad.
-2. El análisis del ACF también indica la existencia de tendencia marcada (por la caída suave de los coeficientes de correlación significativos) y de estacionalidad (porque el coeficiente de correlación #12 es significativo).
+2. El análisis del ACF también indica la existencia de tendencia marcada (por la caída suave de los coeficientes de correlación significativos) y de estacionalidad (porque el coeficiente de correlación #4 es significativo).
 3. El resultado de la prueba de Cox-Stuart permite concluir que existe tendencia y el resultado de la prueba de Friedman lleva a concluir que hay estacionalidad (en ambos casos se rechaza la hipótesis nula según la cual el componente no está presente).
 
 
@@ -63,8 +63,8 @@ seastests::fried(AirPassengers)
 ##   
 
 ```{r}
-datos.training <- window(AirPassengers, end = c(1959, 12))
-datos.test     <- window(AirPassengers, start = c(1960, 1))
+datos.training <- window(datos, end = c(2014, 4))
+datos.test     <- window(datos, start = c(2015, 1))
 
 ```
 
@@ -74,10 +74,16 @@ datos.test     <- window(AirPassengers, start = c(1960, 1))
 datos.training
 ```
 
-#### Datosde prueba para calcular el error del pronóstico
+#### Datos de prueba para calcular el error del pronóstico
 
 ```{r}
 datos.test
 ```
+
+##   
+## 4. Preparación de panel data para regresión
+##
+
+
 
 

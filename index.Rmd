@@ -1,7 +1,9 @@
 ---
-title: "My Website"
+title: "Ejemplo de Pronósticos"
 ---
 
-Hello, Website!
+Este sitio contiene el desarrollo de la construcción de pronósticos para una serie de ejemplo. Más puntualmente, se han aplicado todas las técnicas de pronósticos para la serie:
 
-## Hola a todos, bienvenidos mi página Web
+## Noches trimestrales de turistas en Australia
+
+Esta serie contiene los datos trimestrales de noches que los turistas pasaron en Australia entre 1999 y 2015.

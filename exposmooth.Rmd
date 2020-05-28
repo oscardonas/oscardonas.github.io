@@ -21,7 +21,7 @@ summary(a)
 ## 
 
 ```{r}
-pronostico.ets <- forecast(ets(datos.training), h = 12)
+pronostico.ets <- forecast(ets(datos.training), h = 4)
 pronostico.ets
 summary(pronostico.ets)
 autoplot(pronostico.ets) +
