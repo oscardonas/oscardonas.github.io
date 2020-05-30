@@ -2,6 +2,471 @@
 title: "Regresión lineal"
 ---
 
-##  
-## 1. Descomposición usando STL
+##   
+## 1. Preparación de panel data para regresión
 ##
+
+```{r}
+library(readxl)
+a <- read_excel("Datos para austourists.xls")
+#knitr::kable(head(a))
+a <- ts(a, start = c(1999, 1), frequency = 4)
+b <- ts(datos, start = c(1999, 1), frequency = 4)
+datos.panel <- cbind(b, a)
+class(datos.panel)
+colnames(datos.panel) <- c("Turistas", "t", "Brent_Price", "Q1", "Q2", "Q3", 
+                           "Torres_Gemelas", "Crisis_2008", "US_GDP", "China_GDP")
+knitr::kable(head(datos.panel))
+autoplot(datos.panel[, c(1,2,3,9,10)], facets = TRUE)
+```
+
+
+
+
+##  
+## 2. Cálculo de matriz de correlación entre variables reales
+##
+
+```{r}
+PerformanceAnalytics::chart.Correlation(datos.panel[,c(1,2,3,9,10)])
+```
+
+Del análsis de la matriz de correlaciones se concluye que todas las variables explicativas reales están significativamente relacionadas entre sí. Por tanto, los modelos de regresión múltimple únicamente se podrán hacer combinando una variable real con variables ficticias.
+
+##  
+## 3. Separación de datos de entrenamiento y de prueba en panel data
+##
+
+```{r}
+datos.panel.training <- window(datos.panel, end = c(2014, 4))
+datos.panel.test     <- window(datos.panel, start = c(2015, 1))
+datos.panel.test
+knitr::kable(datos.panel.test)
+```
+
+##  
+## 4. Regresión simple
+##
+
+###
+### Modelo 1
+###
+
+```{r}
+x <- datos.panel.training[,1]
+y <- datos.panel.training[,2]
+
+rs.modelo1 <- lm(y ~ x)
+rs.modelo1
+summary(rs.modelo1)
+qplot(x, y) + xlab("t") + ylab("Turistas") +
+  geom_smooth(method = "lm")
+ss1 <- summary(rs.modelo1)
+
+library(olsrr)
+ols_test_normality(rs.modelo1)     #Normalidad
+mean(rs.modelo1$residuals)
+car::dwt(rs.modelo1)               #Ho no autocorrelación de residuos
+ols_test_breusch_pagan(rs.modelo1) #Homosedasticidad
+ols_plot_resid_stand(rs.modelo1)
+ols_plot_resid_fit(rs.modelo1)
+
+```
+
+El modelo 1 es ACEPTABLE porque sus componentes son significativos y todos los supuestos se cumplen.
+
+###
+### Modelo 2
+###
+
+```{r}
+x <- datos.panel.training[,1]
+y <- datos.panel.training[,3]
+
+rs.modelo2 <- lm(y ~ x)
+rs.modelo2
+summary(rs.modelo2)
+qplot(x, y) + xlab("Brent Price") + ylab("Turistas") +
+  geom_smooth(method = "lm")
+
+library(olsrr)
+ols_test_normality(rs.modelo2)     #Normalidad
+mean(rs.modelo2$residuals)
+car::dwt(rs.modelo2)               #Ho no autocorrelación de residuos
+ols_test_breusch_pagan(rs.modelo2) #Homosedasticidad
+ols_plot_resid_stand(rs.modelo2)
+ols_plot_resid_fit(rs.modelo2)
+
+```
+
+El modelo 2 NO es aceptable porque los residuos están autocorrelacionados.
+
+###
+### Modelo 3
+###
+
+```{r}
+x <- datos.panel.training[,1]
+y <- datos.panel.training[,9]
+
+rs.modelo3 <- lm(y ~ x)
+rs.modelo3
+summary(rs.modelo3)
+qplot(x, y) + xlab("US GDP") + ylab("Turistas") +
+  geom_smooth(method = "lm")
+
+library(olsrr)
+ols_test_normality(rs.modelo3)     #Normalidad
+mean(rs.modelo3$residuals)
+car::dwt(rs.modelo3)               #Ho no autocorrelación de residuos
+ols_test_breusch_pagan(rs.modelo3) #Homosedasticidad
+ols_plot_resid_stand(rs.modelo3)
+ols_plot_resid_fit(rs.modelo3)
+
+```
+
+El modelo 3 NO es aceptable porque los residuos están autocorrelacionados.
+
+###
+### Modelo 4
+###
+
+```{r}
+x <- datos.panel.training[,1]
+y <- datos.panel.training[,10]
+
+rs.modelo4 <- lm(y ~ x)
+rs.modelo4
+summary(rs.modelo4)
+qplot(x, y) + xlab("China GDP") + ylab("Turistas") +
+  geom_smooth(method = "lm")
+
+library(olsrr)
+ols_test_normality(rs.modelo4)     #Normalidad
+mean(rs.modelo4$residuals)
+car::dwt(rs.modelo4)               #Ho no autocorrelación de residuos
+ols_test_breusch_pagan(rs.modelo4) #Homosedasticidad
+ols_plot_resid_stand(rs.modelo4)
+ols_plot_resid_fit(rs.modelo4)
+
+```
+
+El modelo 4 NO es aceptable porque los residuos están autocorrelacionados.
+
+En resumen, de los modelos de regresión simple construidos, el único aceptable es:
+
+* Modelo 1  con R^2^ ajustado de `r ss1$adj.r.squared`
+
+
+
+##  
+## 5. Regresión múltiple
+##
+
+###
+### Modelo 1
+###
+
+```{r}
+rm.modelo1 <- lm(Turistas ~ t + Q1 + Q2 + Q3 + Torres_Gemelas + Crisis_2008, 
+                 data = datos.panel.training)
+rm.modelo1
+summary(rm.modelo1)
+
+
+library(olsrr)
+ols_test_normality(rm.modelo1)     #Normalidad
+mean(rm.modelo1$residuals)
+car::dwt(rm.modelo1)               #Ho no autocorrelación de residuos
+ols_test_breusch_pagan(rm.modelo1) #Homosedasticidad
+ols_plot_resid_stand(rm.modelo1)
+ols_plot_resid_fit(rm.modelo1)
+
+```
+
+###
+### Modelo 2
+###
+
+```{r}
+rm.modelo2 <- lm(Turistas ~ Brent_Price + Q1 + Q2 + Q3 + Torres_Gemelas + Crisis_2008, 
+                 data = datos.panel.training)
+rm.modelo2
+summary(rm.modelo2)
+
+
+library(olsrr)
+ols_test_normality(rm.modelo2)     #Normalidad
+mean(rm.modelo2$residuals)
+car::dwt(rm.modelo2)               #Ho no autocorrelación de residuos
+ols_test_breusch_pagan(rm.modelo2) #Homosedasticidad
+ols_plot_resid_stand(rm.modelo2)
+ols_plot_resid_fit(rm.modelo2)
+
+```
+
+
+###
+### Modelo 3
+###
+
+```{r}
+rm.modelo3 <- lm(Turistas ~ US_GDP + Q1 + Q2 + Q3 + Torres_Gemelas + Crisis_2008, 
+                 data = datos.panel.training)
+rm.modelo3
+summary(rm.modelo3)
+
+
+library(olsrr)
+ols_test_normality(rm.modelo3)     #Normalidad
+mean(rm.modelo3$residuals)
+car::dwt(rm.modelo3)               #Ho no autocorrelación de residuos
+ols_test_breusch_pagan(rm.modelo3) #Homosedasticidad
+ols_plot_resid_stand(rm.modelo3)
+ols_plot_resid_fit(rm.modelo3)
+
+```
+
+###
+### Modelo 4
+###
+
+```{r}
+rm.modelo4 <- lm(Turistas ~ China_GDP + Q1 + Q2 + Q3 + Torres_Gemelas + Crisis_2008, 
+                 data = datos.panel.training)
+rm.modelo4
+summary(rm.modelo4)
+
+
+library(olsrr)
+ols_test_normality(rm.modelo4)     #Normalidad
+mean(rm.modelo4$residuals)
+car::dwt(rm.modelo4)               #Ho no autocorrelación de residuos
+ols_test_breusch_pagan(rm.modelo4) #Homosedasticidad
+ols_plot_resid_stand(rm.modelo4)
+ols_plot_resid_fit(rm.modelo4)
+
+```
+
+Sin hacer un análisis detallado de cada modelo, es claro que la variable Crisis_2008 no es significativa en ninguno de ellos, por lo que se procederá a eliminarla y se volverá a contruir todos los modelos de regresión múltiple.
+
+###
+### Modelo 5
+###
+
+```{r}
+rm.modelo5 <- lm(Turistas ~ t + Q1 + Q2 + Q3 + Torres_Gemelas, 
+                 data = datos.panel.training)
+rm.modelo5
+summary(rm.modelo5)
+ms5 <- summary(rm.modelo5)
+
+library(olsrr)
+ols_test_normality(rm.modelo5)     #Normalidad
+mean(rm.modelo5$residuals)
+car::dwt(rm.modelo5)               #Ho no autocorrelación de residuos
+ols_test_breusch_pagan(rm.modelo5) #Homosedasticidad
+ols_plot_resid_stand(rm.modelo5)
+ols_plot_resid_fit(rm.modelo5)
+
+```
+
+El modelo 5 es ACEPTABLE, todos los componentes son significativos y cumple todos los supuestos.
+
+###
+### Modelo 6
+###
+
+```{r}
+rm.modelo6 <- lm(Turistas ~ Brent_Price + Q1 + Q2 + Q3 + Torres_Gemelas, 
+                 data = datos.panel.training)
+rm.modelo6
+summary(rm.modelo6)
+
+
+library(olsrr)
+ols_test_normality(rm.modelo6)     #Normalidad
+mean(rm.modelo6$residuals)
+car::dwt(rm.modelo6)               #Ho no autocorrelación de residuos
+ols_test_breusch_pagan(rm.modelo6) #Homosedasticidad
+ols_plot_resid_stand(rm.modelo6)
+ols_plot_resid_fit(rm.modelo6)
+
+```
+
+El modelo 6 NO es aceptable, pues dos de sus componentes no son significativos.
+
+###
+### Modelo 7
+###
+
+```{r}
+rm.modelo7 <- lm(Turistas ~ US_GDP + Q1 + Q2 + Q3 + Torres_Gemelas, 
+                 data = datos.panel.training)
+rm.modelo7
+summary(rm.modelo7)
+ms7 <- summary(rm.modelo7)
+
+library(olsrr)
+ols_test_normality(rm.modelo7)     #Normalidad
+mean(rm.modelo7$residuals)
+car::dwt(rm.modelo7)               #Ho no autocorrelación de residuos
+ols_test_breusch_pagan(rm.modelo7) #Homosedasticidad
+ols_plot_resid_stand(rm.modelo7)
+ols_plot_resid_fit(rm.modelo7)
+
+```
+
+El modelo 7 es ACEPTABLE, todos los componentes son significativos y cumple todos los supuestos.
+
+###
+### Modelo 8
+###
+
+```{r}
+rm.modelo8 <- lm(Turistas ~ China_GDP + Q1 + Q2 + Q3 + Torres_Gemelas, 
+                 data = datos.panel.training)
+rm.modelo8
+summary(rm.modelo8)
+
+
+library(olsrr)
+ols_test_normality(rm.modelo8)     #Normalidad
+mean(rm.modelo8$residuals)
+car::dwt(rm.modelo8)               #Ho no autocorrelación de residuos
+ols_test_breusch_pagan(rm.modelo8) #Homosedasticidad
+ols_plot_resid_stand(rm.modelo8)
+ols_plot_resid_fit(rm.modelo8)
+
+```
+
+El modelo 8 NO es aceptable, pues el componente Torres_Gemelas no es significativo.
+
+Se procederá a rehacer los modelos 6 y 8 eliminando los componentes no significativos.
+
+###
+### Modelo 9
+###
+
+```{r}
+rm.modelo9 <- lm(Turistas ~ Brent_Price + Q1 + Q2, 
+                 data = datos.panel.training)
+rm.modelo9
+summary(rm.modelo9)
+
+
+library(olsrr)
+ols_test_normality(rm.modelo9)     #Normalidad
+mean(rm.modelo9$residuals)
+car::dwt(rm.modelo9)               #Ho no autocorrelación de residuos
+ols_test_breusch_pagan(rm.modelo9) #Homosedasticidad
+ols_plot_resid_stand(rm.modelo9)
+ols_plot_resid_fit(rm.modelo9)
+
+```
+
+El modelo 9 NO es aceptable, pues los residuos están autocorrelacionados y no cumple con el supuesto de homosedasticidad.
+
+###
+### Modelo 10
+###
+
+```{r}
+rm.modelo10 <- lm(Turistas ~ China_GDP + Q1 + Q2 + Q3, 
+                 data = datos.panel.training)
+rm.modelo10
+summary(rm.modelo10)
+ms10 <- summary(rm.modelo10)
+
+
+library(olsrr)
+ols_test_normality(rm.modelo10)     #Normalidad
+mean(rm.modelo10$residuals)
+car::dwt(rm.modelo10)               #Ho no autocorrelación de residuos
+ols_test_breusch_pagan(rm.modelo10) #Homosedasticidad
+ols_plot_resid_stand(rm.modelo10)
+ols_plot_resid_fit(rm.modelo10)
+
+```
+
+El modelo 10 es ACEPTABLE, todos los componentes son significativos y cumple todos los supuestos.
+
+
+En resumen, de los modelos de regresión múltiple construidos, los aceptables son:
+
+* Modelo 5  con R^2^ ajustado de `r ms5$adj.r.squared`
+* Modelo 7  con R^2^ ajustado de `r ms7$adj.r.squared`
+* Modelo 10 con R^2^ ajustado de `r ms10$adj.r.squared`
+
+Con base en el R^2^ ajustado, el mejor modelo de regresión múltiple es el modelo 5.
+
+##  
+## 6. Evaluación con error de pronóstico
+##
+
+### Cálculo del error de pronóstico con el mejor modelo de regresión simple
+###   
+
+```{r}
+nuevas.xs <- data.frame(x = datos.panel.test[,2])
+nuevas.xs
+pronostico.rs <- predict(rs.modelo1, newdata =  nuevas.xs)
+pronostico.rs
+
+mae.rs <- Metrics::mae(datos.test, pronostico.rs)
+mse.rs <- Metrics::mse(datos.test, pronostico.rs)
+errores.rs <- c(mae.rs, mse.rs)
+errores.rs <- matrix(errores.rs, 1, 2)
+colnames(errores.rs) <- c("MAE", "MSE")
+rownames(errores.rs) <- "Mejor Reg Simple"
+knitr::kable(errores.rs)
+
+pronostico.rs.ts <- ts(pronostico.rs, start = c(2015,1), frequency = 4)
+pronostico.rs.ts
+datos.graf.rs <- cbind(datos.training, pronostico.rs.ts)
+autoplot(datos.graf.rs)
+
+```
+
+### Cálculo del error de pronóstico con el mejor modelo de regresión múltiple
+###   
+
+```{r}
+nuevas.xm <- data.frame(t  <- datos.panel.test[, 2],
+                        Q1 <- datos.panel.test[,4],
+                        Q2 <- datos.panel.test[,5],
+                        Q3 <- datos.panel.test[,6],
+                        Torres_Gemelas <- datos.panel.test[,7])
+                        
+knitr::kable(nuevas.xm)
+pronostico.rm <- predict(rm.modelo5, newdata =  nuevas.x)
+pronostico.rm
+
+mae.rm <- Metrics::mae(datos.test, pronostico.rm)
+mse.rm <- Metrics::mse(datos.test, pronostico.rm)
+errores.rm <- c(mae.rm, mse.rm)
+errores.rm <- matrix(errores.rm, 1, 2)
+colnames(errores.rm) <- c("MAE", "MSE")
+rownames(errores.rm) <- "Mejor Reg Múltiple"
+knitr::kable(errores.rm)
+
+pronostico.rm.ts <- ts(pronostico.rm, start = c(2015,1), frequency = 4)
+pronostico.rm.ts
+datos.graf.rm <- cbind(datos.training, pronostico.rm.ts)
+autoplot(datos.graf.rm)
+
+```
+
+##  
+## 7. Recomendación
+##
+
+Con base en los errores de pronóstico, el mejor modelo de regresión es el modelo 5 de regresión múltimple.
+
+```{r}
+errores.regre <- matrix(errores.rm, 1, 2)
+colnames(errores.regre) <- c("MAE", "MSE")
+rownames(errores.regre) <- "Mejor Regresión"
+knitr::kable(errores.regre)
+```
+

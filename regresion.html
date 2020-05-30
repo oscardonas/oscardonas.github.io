@@ -302,6 +302,9 @@ $(document).ready(function () {
   <a href="arima.html">ARIMA</a>
 </li>
 <li>
+  <a href="Resumen.html">Resumen</a>
+</li>
+<li>
   <a href="about.html">About</a>
 </li>
       </ul>
@@ -324,11 +327,1562 @@ $(document).ready(function () {
 <div id="section" class="section level2">
 <h2></h2>
 </div>
-<div id="descomposicion-usando-stl" class="section level2">
-<h2>1. Descomposición usando STL</h2>
+<div id="preparacion-de-panel-data-para-regresion" class="section level2">
+<h2>1. Preparación de panel data para regresión</h2>
 </div>
 <div id="section-1" class="section level2">
 <h2></h2>
+<pre class="r"><code>library(readxl)
+a &lt;- read_excel(&quot;Datos para austourists.xls&quot;)
+#knitr::kable(head(a))
+a &lt;- ts(a, start = c(1999, 1), frequency = 4)
+b &lt;- ts(datos, start = c(1999, 1), frequency = 4)
+datos.panel &lt;- cbind(b, a)
+class(datos.panel)</code></pre>
+<pre><code>## [1] &quot;mts&quot;    &quot;ts&quot;     &quot;matrix&quot;</code></pre>
+<pre class="r"><code>colnames(datos.panel) &lt;- c(&quot;Turistas&quot;, &quot;t&quot;, &quot;Brent_Price&quot;, &quot;Q1&quot;, &quot;Q2&quot;, &quot;Q3&quot;, 
+                           &quot;Torres_Gemelas&quot;, &quot;Crisis_2008&quot;, &quot;US_GDP&quot;, &quot;China_GDP&quot;)
+knitr::kable(head(datos.panel))</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="right">Turistas</th>
+<th align="right">t</th>
+<th align="right">Brent_Price</th>
+<th align="right">Q1</th>
+<th align="right">Q2</th>
+<th align="right">Q3</th>
+<th align="right">Torres_Gemelas</th>
+<th align="right">Crisis_2008</th>
+<th align="right">US_GDP</th>
+<th align="right">China_GDP</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">30.05251</td>
+<td align="right">1</td>
+<td align="right">16.97</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">9524.152</td>
+<td align="right">2.15677e+12</td>
+</tr>
+<tr class="even">
+<td align="right">19.14850</td>
+<td align="right">2</td>
+<td align="right">22.98</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">9681.856</td>
+<td align="right">2.30508e+12</td>
+</tr>
+<tr class="odd">
+<td align="right">25.31769</td>
+<td align="right">3</td>
+<td align="right">24.93</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">9899.378</td>
+<td align="right">2.65839e+12</td>
+</tr>
+<tr class="even">
+<td align="right">27.59144</td>
+<td align="right">4</td>
+<td align="right">23.98</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">10002.857</td>
+<td align="right">2.13299e+12</td>
+</tr>
+<tr class="odd">
+<td align="right">32.07646</td>
+<td align="right">5</td>
+<td align="right">31.58</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">10247.679</td>
+<td align="right">2.40434e+12</td>
+</tr>
+<tr class="even">
+<td align="right">23.48796</td>
+<td align="right">6</td>
+<td align="right">28.42</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">10319.825</td>
+<td align="right">2.57125e+12</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>autoplot(datos.panel[, c(1,2,3,9,10)], facets = TRUE)</code></pre>
+<p><img src="regresion_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
+</div>
+<div id="section-2" class="section level2">
+<h2></h2>
+</div>
+<div id="calculo-de-matriz-de-correlacion-entre-variables-reales" class="section level2">
+<h2>2. Cálculo de matriz de correlación entre variables reales</h2>
+</div>
+<div id="section-3" class="section level2">
+<h2></h2>
+<pre class="r"><code>PerformanceAnalytics::chart.Correlation(datos.panel[,c(1,2,3,9,10)])</code></pre>
+<p><img src="regresion_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<p>Del análsis de la matriz de correlaciones se concluye que todas las variables explicativas reales están significativamente relacionadas entre sí. Por tanto, los modelos de regresión múltimple únicamente se podrán hacer combinando una variable real con variables ficticias.</p>
+</div>
+<div id="section-4" class="section level2">
+<h2></h2>
+</div>
+<div id="separacion-de-datos-de-entrenamiento-y-de-prueba-en-panel-data" class="section level2">
+<h2>3. Separación de datos de entrenamiento y de prueba en panel data</h2>
+</div>
+<div id="section-5" class="section level2">
+<h2></h2>
+<pre class="r"><code>datos.panel.training &lt;- window(datos.panel, end = c(2014, 4))
+datos.panel.test     &lt;- window(datos.panel, start = c(2015, 1))
+datos.panel.test</code></pre>
+<pre><code>##         Turistas  t Brent_Price Q1 Q2 Q3 Torres_Gemelas Crisis_2008
+## 2015 Q1 73.25703 65       60.31  1  0  0              1           0
+## 2015 Q2 47.69662 66       47.29  0  1  0              1           0
+## 2015 Q3 61.09777 67       36.61  0  0  1              1           0
+## 2015 Q4 66.05576 68       36.75  0  0  0              1           0
+##           US_GDP    China_GDP
+## 2015 Q1 18219.40 1.685497e+13
+## 2015 Q2 18344.71 1.765977e+13
+## 2015 Q3 18350.83 1.925729e+13
+## 2015 Q4 18424.28 1.624100e+13</code></pre>
+<pre class="r"><code>knitr::kable(datos.panel.test)</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="right">Turistas</th>
+<th align="right">t</th>
+<th align="right">Brent_Price</th>
+<th align="right">Q1</th>
+<th align="right">Q2</th>
+<th align="right">Q3</th>
+<th align="right">Torres_Gemelas</th>
+<th align="right">Crisis_2008</th>
+<th align="right">US_GDP</th>
+<th align="right">China_GDP</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">73.25703</td>
+<td align="right">65</td>
+<td align="right">60.31</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">18219.40</td>
+<td align="right">1.685497e+13</td>
+</tr>
+<tr class="even">
+<td align="right">47.69662</td>
+<td align="right">66</td>
+<td align="right">47.29</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">18344.71</td>
+<td align="right">1.765977e+13</td>
+</tr>
+<tr class="odd">
+<td align="right">61.09777</td>
+<td align="right">67</td>
+<td align="right">36.61</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">18350.83</td>
+<td align="right">1.925729e+13</td>
+</tr>
+<tr class="even">
+<td align="right">66.05576</td>
+<td align="right">68</td>
+<td align="right">36.75</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">18424.28</td>
+<td align="right">1.624100e+13</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="section-6" class="section level2">
+<h2></h2>
+</div>
+<div id="regresion-simple" class="section level2">
+<h2>4. Regresión simple</h2>
+</div>
+<div id="section-7" class="section level2">
+<h2></h2>
+<div id="section-8" class="section level3">
+<h3></h3>
+</div>
+<div id="modelo-1" class="section level3">
+<h3>Modelo 1</h3>
+</div>
+<div id="section-9" class="section level3">
+<h3></h3>
+<pre class="r"><code>x &lt;- datos.panel.training[,1]
+y &lt;- datos.panel.training[,2]
+
+rs.modelo1 &lt;- lm(y ~ x)
+rs.modelo1</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = y ~ x)
+## 
+## Coefficients:
+## (Intercept)            x  
+##      -17.42         1.26</code></pre>
+<pre class="r"><code>summary(rs.modelo1)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = y ~ x)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -20.0023  -9.9687   0.2562   6.4460  25.1566 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) -17.4165     5.0671  -3.437  0.00106 ** 
+## x             1.2601     0.1227  10.267 5.34e-15 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 11.42 on 62 degrees of freedom
+## Multiple R-squared:  0.6297, Adjusted R-squared:  0.6237 
+## F-statistic: 105.4 on 1 and 62 DF,  p-value: 5.336e-15</code></pre>
+<pre class="r"><code>qplot(x, y) + xlab(&quot;t&quot;) + ylab(&quot;Turistas&quot;) +
+  geom_smooth(method = &quot;lm&quot;)</code></pre>
+<pre><code>## Don&#39;t know how to automatically pick scale for object of type ts. Defaulting to continuous.
+## Don&#39;t know how to automatically pick scale for object of type ts. Defaulting to continuous.</code></pre>
+<p><img src="regresion_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<pre class="r"><code>ss1 &lt;- summary(rs.modelo1)
+
+library(olsrr)
+ols_test_normality(rs.modelo1)     #Normalidad</code></pre>
+<pre><code>## -----------------------------------------------
+##        Test             Statistic       pvalue  
+## -----------------------------------------------
+## Shapiro-Wilk              0.9709         0.1355 
+## Kolmogorov-Smirnov        0.0888         0.6615 
+## Cramer-von Mises          5.3333         0.0000 
+## Anderson-Darling          0.5919         0.1175 
+## -----------------------------------------------</code></pre>
+<pre class="r"><code>mean(rs.modelo1$residuals)</code></pre>
+<pre><code>## [1] 2.145094e-16</code></pre>
+<pre class="r"><code>car::dwt(rs.modelo1)               #Ho no autocorrelación de residuos</code></pre>
+<pre><code>##  lag Autocorrelation D-W Statistic p-value
+##    1       0.1670674      1.614604    0.11
+##  Alternative hypothesis: rho != 0</code></pre>
+<pre class="r"><code>ols_test_breusch_pagan(rs.modelo1) #Homosedasticidad</code></pre>
+<pre><code>## 
+##  Breusch Pagan Test for Heteroskedasticity
+##  -----------------------------------------
+##  Ho: the variance is constant            
+##  Ha: the variance is not constant        
+## 
+##             Data              
+##  -----------------------------
+##  Response : y 
+##  Variables: fitted values of y 
+## 
+##         Test Summary         
+##  ----------------------------
+##  DF            =    1 
+##  Chi2          =    0.197158 
+##  Prob &gt; Chi2   =    0.6570247</code></pre>
+<pre class="r"><code>ols_plot_resid_stand(rs.modelo1)</code></pre>
+<p><img src="regresion_files/figure-html/unnamed-chunk-4-2.png" width="672" /></p>
+<pre class="r"><code>ols_plot_resid_fit(rs.modelo1)</code></pre>
+<p><img src="regresion_files/figure-html/unnamed-chunk-4-3.png" width="672" /></p>
+<p>El modelo 1 es ACEPTABLE porque sus componentes son significativos y todos los supuestos se cumplen.</p>
+</div>
+<div id="section-10" class="section level3">
+<h3></h3>
+</div>
+<div id="modelo-2" class="section level3">
+<h3>Modelo 2</h3>
+</div>
+<div id="section-11" class="section level3">
+<h3></h3>
+<pre class="r"><code>x &lt;- datos.panel.training[,1]
+y &lt;- datos.panel.training[,3]
+
+rs.modelo2 &lt;- lm(y ~ x)
+rs.modelo2</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = y ~ x)
+## 
+## Coefficients:
+## (Intercept)            x  
+##     -13.663        1.974</code></pre>
+<pre class="r"><code>summary(rs.modelo2)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = y ~ x)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -50.780 -18.560  -2.126  18.889  50.904 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  -13.662     11.232  -1.216    0.228    
+## x              1.974      0.272   7.257  7.7e-10 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 25.32 on 62 degrees of freedom
+## Multiple R-squared:  0.4593, Adjusted R-squared:  0.4506 
+## F-statistic: 52.67 on 1 and 62 DF,  p-value: 7.701e-10</code></pre>
+<pre class="r"><code>qplot(x, y) + xlab(&quot;Brent Price&quot;) + ylab(&quot;Turistas&quot;) +
+  geom_smooth(method = &quot;lm&quot;)</code></pre>
+<pre><code>## Don&#39;t know how to automatically pick scale for object of type ts. Defaulting to continuous.
+## Don&#39;t know how to automatically pick scale for object of type ts. Defaulting to continuous.</code></pre>
+<p><img src="regresion_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<pre class="r"><code>library(olsrr)
+ols_test_normality(rs.modelo2)     #Normalidad</code></pre>
+<pre><code>## -----------------------------------------------
+##        Test             Statistic       pvalue  
+## -----------------------------------------------
+## Shapiro-Wilk              0.9691         0.1080 
+## Kolmogorov-Smirnov        0.0998         0.5145 
+## Cramer-von Mises          5.3734         0.0000 
+## Anderson-Darling          0.5915         0.1177 
+## -----------------------------------------------</code></pre>
+<pre class="r"><code>mean(rs.modelo2$residuals)</code></pre>
+<pre><code>## [1] 9.099709e-16</code></pre>
+<pre class="r"><code>car::dwt(rs.modelo2)               #Ho no autocorrelación de residuos</code></pre>
+<pre><code>##  lag Autocorrelation D-W Statistic p-value
+##    1       0.4109027      1.092582       0
+##  Alternative hypothesis: rho != 0</code></pre>
+<pre class="r"><code>ols_test_breusch_pagan(rs.modelo2) #Homosedasticidad</code></pre>
+<pre><code>## 
+##  Breusch Pagan Test for Heteroskedasticity
+##  -----------------------------------------
+##  Ho: the variance is constant            
+##  Ha: the variance is not constant        
+## 
+##             Data              
+##  -----------------------------
+##  Response : y 
+##  Variables: fitted values of y 
+## 
+##         Test Summary         
+##  ----------------------------
+##  DF            =    1 
+##  Chi2          =    1.517948 
+##  Prob &gt; Chi2   =    0.2179303</code></pre>
+<pre class="r"><code>ols_plot_resid_stand(rs.modelo2)</code></pre>
+<p><img src="regresion_files/figure-html/unnamed-chunk-5-2.png" width="672" /></p>
+<pre class="r"><code>ols_plot_resid_fit(rs.modelo2)</code></pre>
+<p><img src="regresion_files/figure-html/unnamed-chunk-5-3.png" width="672" /></p>
+<p>El modelo 2 NO es aceptable porque los residuos están autocorrelacionados.</p>
+</div>
+<div id="section-12" class="section level3">
+<h3></h3>
+</div>
+<div id="modelo-3" class="section level3">
+<h3>Modelo 3</h3>
+</div>
+<div id="section-13" class="section level3">
+<h3></h3>
+<pre class="r"><code>x &lt;- datos.panel.training[,1]
+y &lt;- datos.panel.training[,9]
+
+rs.modelo3 &lt;- lm(y ~ x)
+rs.modelo3</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = y ~ x)
+## 
+## Coefficients:
+## (Intercept)            x  
+##      7301.7        160.8</code></pre>
+<pre class="r"><code>summary(rs.modelo3)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = y ~ x)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -2626.2 -1189.0   174.9   972.9  3497.3 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)   7301.7      672.8  10.853 5.75e-16 ***
+## x              160.8       16.3   9.865 2.51e-14 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 1517 on 62 degrees of freedom
+## Multiple R-squared:  0.6109, Adjusted R-squared:  0.6046 
+## F-statistic: 97.32 on 1 and 62 DF,  p-value: 2.514e-14</code></pre>
+<pre class="r"><code>qplot(x, y) + xlab(&quot;US GDP&quot;) + ylab(&quot;Turistas&quot;) +
+  geom_smooth(method = &quot;lm&quot;)</code></pre>
+<pre><code>## Don&#39;t know how to automatically pick scale for object of type ts. Defaulting to continuous.
+## Don&#39;t know how to automatically pick scale for object of type ts. Defaulting to continuous.</code></pre>
+<p><img src="regresion_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<pre class="r"><code>library(olsrr)
+ols_test_normality(rs.modelo3)     #Normalidad</code></pre>
+<pre><code>## -----------------------------------------------
+##        Test             Statistic       pvalue  
+## -----------------------------------------------
+## Shapiro-Wilk              0.9767         0.2656 
+## Kolmogorov-Smirnov        0.1006         0.5046 
+## Cramer-von Mises          5.349          0.0000 
+## Anderson-Darling          0.4443         0.2764 
+## -----------------------------------------------</code></pre>
+<pre class="r"><code>mean(rs.modelo3$residuals)</code></pre>
+<pre><code>## [1] -3.8268e-14</code></pre>
+<pre class="r"><code>car::dwt(rs.modelo3)               #Ho no autocorrelación de residuos</code></pre>
+<pre><code>##  lag Autocorrelation D-W Statistic p-value
+##    1       0.2221968      1.499948   0.022
+##  Alternative hypothesis: rho != 0</code></pre>
+<pre class="r"><code>ols_test_breusch_pagan(rs.modelo3) #Homosedasticidad</code></pre>
+<pre><code>## 
+##  Breusch Pagan Test for Heteroskedasticity
+##  -----------------------------------------
+##  Ho: the variance is constant            
+##  Ha: the variance is not constant        
+## 
+##             Data              
+##  -----------------------------
+##  Response : y 
+##  Variables: fitted values of y 
+## 
+##        Test Summary         
+##  ---------------------------
+##  DF            =    1 
+##  Chi2          =    0.303488 
+##  Prob &gt; Chi2   =    0.581704</code></pre>
+<pre class="r"><code>ols_plot_resid_stand(rs.modelo3)</code></pre>
+<p><img src="regresion_files/figure-html/unnamed-chunk-6-2.png" width="672" /></p>
+<pre class="r"><code>ols_plot_resid_fit(rs.modelo3)</code></pre>
+<p><img src="regresion_files/figure-html/unnamed-chunk-6-3.png" width="672" /></p>
+<p>El modelo 3 NO es aceptable porque los residuos están autocorrelacionados.</p>
+</div>
+<div id="section-14" class="section level3">
+<h3></h3>
+</div>
+<div id="modelo-4" class="section level3">
+<h3>Modelo 4</h3>
+</div>
+<div id="section-15" class="section level3">
+<h3></h3>
+<pre class="r"><code>x &lt;- datos.panel.training[,1]
+y &lt;- datos.panel.training[,10]
+
+rs.modelo4 &lt;- lm(y ~ x)
+rs.modelo4</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = y ~ x)
+## 
+## Coefficients:
+## (Intercept)            x  
+##  -4.582e+12    3.079e+11</code></pre>
+<pre class="r"><code>summary(rs.modelo4)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = y ~ x)
+## 
+## Residuals:
+##        Min         1Q     Median         3Q        Max 
+## -4.257e+12 -2.211e+12 -2.659e+11  1.362e+12  7.871e+12 
+## 
+## Coefficients:
+##               Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) -4.582e+12  1.348e+12  -3.399  0.00119 ** 
+## x            3.079e+11  3.265e+10   9.430 1.37e-13 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 3.039e+12 on 62 degrees of freedom
+## Multiple R-squared:  0.5892, Adjusted R-squared:  0.5826 
+## F-statistic: 88.92 on 1 and 62 DF,  p-value: 1.371e-13</code></pre>
+<pre class="r"><code>qplot(x, y) + xlab(&quot;China GDP&quot;) + ylab(&quot;Turistas&quot;) +
+  geom_smooth(method = &quot;lm&quot;)</code></pre>
+<pre><code>## Don&#39;t know how to automatically pick scale for object of type ts. Defaulting to continuous.
+## Don&#39;t know how to automatically pick scale for object of type ts. Defaulting to continuous.</code></pre>
+<p><img src="regresion_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+<pre class="r"><code>library(olsrr)
+ols_test_normality(rs.modelo4)     #Normalidad</code></pre>
+<pre><code>## -----------------------------------------------
+##        Test             Statistic       pvalue  
+## -----------------------------------------------
+## Shapiro-Wilk              0.9481         0.0093 
+## Kolmogorov-Smirnov         0.09          0.6451 
+## Cramer-von Mises          5.474          0.0000 
+## Anderson-Darling          0.7873         0.0390 
+## -----------------------------------------------</code></pre>
+<pre class="r"><code>mean(rs.modelo4$residuals)</code></pre>
+<pre><code>## [1] 0.0001814663</code></pre>
+<pre class="r"><code>car::dwt(rs.modelo4)               #Ho no autocorrelación de residuos</code></pre>
+<pre><code>##  lag Autocorrelation D-W Statistic p-value
+##    1       0.2693831      1.447361   0.018
+##  Alternative hypothesis: rho != 0</code></pre>
+<pre class="r"><code>ols_test_breusch_pagan(rs.modelo4) #Homosedasticidad</code></pre>
+<pre><code>## 
+##  Breusch Pagan Test for Heteroskedasticity
+##  -----------------------------------------
+##  Ho: the variance is constant            
+##  Ha: the variance is not constant        
+## 
+##             Data              
+##  -----------------------------
+##  Response : y 
+##  Variables: fitted values of y 
+## 
+##        Test Summary         
+##  ---------------------------
+##  DF            =    1 
+##  Chi2          =    2.18286 
+##  Prob &gt; Chi2   =    0.139555</code></pre>
+<pre class="r"><code>ols_plot_resid_stand(rs.modelo4)</code></pre>
+<p><img src="regresion_files/figure-html/unnamed-chunk-7-2.png" width="672" /></p>
+<pre class="r"><code>ols_plot_resid_fit(rs.modelo4)</code></pre>
+<p><img src="regresion_files/figure-html/unnamed-chunk-7-3.png" width="672" /></p>
+<p>El modelo 4 NO es aceptable porque los residuos están autocorrelacionados.</p>
+<p>En resumen, de los modelos de regresión simple construidos, el único aceptable es:</p>
+<ul>
+<li>Modelo 1 con R<sup>2</sup> ajustado de 0.6236842</li>
+</ul>
+</div>
+</div>
+<div id="section-16" class="section level2">
+<h2></h2>
+</div>
+<div id="regresion-multiple" class="section level2">
+<h2>5. Regresión múltiple</h2>
+</div>
+<div id="section-17" class="section level2">
+<h2></h2>
+<div id="section-18" class="section level3">
+<h3></h3>
+</div>
+<div id="modelo-1-1" class="section level3">
+<h3>Modelo 1</h3>
+</div>
+<div id="section-19" class="section level3">
+<h3></h3>
+<pre class="r"><code>rm.modelo1 &lt;- lm(Turistas ~ t + Q1 + Q2 + Q3 + Torres_Gemelas + Crisis_2008, 
+                 data = datos.panel.training)
+rm.modelo1</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = Turistas ~ t + Q1 + Q2 + Q3 + Torres_Gemelas + Crisis_2008, 
+##     data = datos.panel.training)
+## 
+## Coefficients:
+##    (Intercept)               t              Q1              Q2  
+##        26.7344          0.5759          7.7148        -10.6234  
+##             Q3  Torres_Gemelas     Crisis_2008  
+##        -3.1724         -5.1566         -0.2390</code></pre>
+<pre class="r"><code>summary(rm.modelo1)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = Turistas ~ t + Q1 + Q2 + Q3 + Torres_Gemelas + Crisis_2008, 
+##     data = datos.panel.training)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -5.2520 -1.4556 -0.0419  1.3727  4.8082 
+## 
+## Coefficients:
+##                 Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)     26.73445    0.93363  28.635  &lt; 2e-16 ***
+## t                0.57585    0.02216  25.988  &lt; 2e-16 ***
+## Q1               7.71478    0.85378   9.036 1.35e-12 ***
+## Q2             -10.62341    0.85343 -12.448  &lt; 2e-16 ***
+## Q3              -3.17245    0.85365  -3.716 0.000463 ***
+## Torres_Gemelas  -5.15661    1.05711  -4.878 8.98e-06 ***
+## Crisis_2008     -0.23900    0.81256  -0.294 0.769721    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 2.409 on 57 degrees of freedom
+## Multiple R-squared:  0.9618, Adjusted R-squared:  0.9578 
+## F-statistic: 239.1 on 6 and 57 DF,  p-value: &lt; 2.2e-16</code></pre>
+<pre class="r"><code>library(olsrr)
+ols_test_normality(rm.modelo1)     #Normalidad</code></pre>
+<pre><code>## -----------------------------------------------
+##        Test             Statistic       pvalue  
+## -----------------------------------------------
+## Shapiro-Wilk              0.9874         0.7583 
+## Kolmogorov-Smirnov        0.0742         0.8463 
+## Cramer-von Mises          4.2768         0.0000 
+## Anderson-Darling          0.2159         0.8392 
+## -----------------------------------------------</code></pre>
+<pre class="r"><code>mean(rm.modelo1$residuals)</code></pre>
+<pre><code>## [1] -4.510281e-17</code></pre>
+<pre class="r"><code>car::dwt(rm.modelo1)               #Ho no autocorrelación de residuos</code></pre>
+<pre><code>##  lag Autocorrelation D-W Statistic p-value
+##    1      -0.2466991      2.412738    0.18
+##  Alternative hypothesis: rho != 0</code></pre>
+<pre class="r"><code>ols_test_breusch_pagan(rm.modelo1) #Homosedasticidad</code></pre>
+<pre><code>## 
+##  Breusch Pagan Test for Heteroskedasticity
+##  -----------------------------------------
+##  Ho: the variance is constant            
+##  Ha: the variance is not constant        
+## 
+##                 Data                 
+##  ------------------------------------
+##  Response : Turistas 
+##  Variables: fitted values of Turistas 
+## 
+##         Test Summary         
+##  ----------------------------
+##  DF            =    1 
+##  Chi2          =    0.1013312 
+##  Prob &gt; Chi2   =    0.750238</code></pre>
+<pre class="r"><code>ols_plot_resid_stand(rm.modelo1)</code></pre>
+<p><img src="regresion_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+<pre class="r"><code>ols_plot_resid_fit(rm.modelo1)</code></pre>
+<p><img src="regresion_files/figure-html/unnamed-chunk-8-2.png" width="672" /></p>
+</div>
+<div id="section-20" class="section level3">
+<h3></h3>
+</div>
+<div id="modelo-2-1" class="section level3">
+<h3>Modelo 2</h3>
+</div>
+<div id="section-21" class="section level3">
+<h3></h3>
+<pre class="r"><code>rm.modelo2 &lt;- lm(Turistas ~ Brent_Price + Q1 + Q2 + Q3 + Torres_Gemelas + Crisis_2008, 
+                 data = datos.panel.training)
+rm.modelo2</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = Turistas ~ Brent_Price + Q1 + Q2 + Q3 + Torres_Gemelas + 
+##     Crisis_2008, data = datos.panel.training)
+## 
+## Coefficients:
+##    (Intercept)     Brent_Price              Q1              Q2  
+##        25.4293          0.2079          6.3832        -11.0618  
+##             Q3  Torres_Gemelas     Crisis_2008  
+##        -2.1295          2.3497          2.7850</code></pre>
+<pre class="r"><code>summary(rm.modelo2)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = Turistas ~ Brent_Price + Q1 + Q2 + Q3 + Torres_Gemelas + 
+##     Crisis_2008, data = datos.panel.training)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -11.6972  -3.2399  -0.8562   3.2396  20.8939 
+## 
+## Coefficients:
+##                 Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)     25.42932    2.39267  10.628 3.85e-15 ***
+## Brent_Price      0.20789    0.02682   7.751 1.78e-10 ***
+## Q1               6.38321    2.13637   2.988  0.00414 ** 
+## Q2             -11.06183    2.13507  -5.181 3.01e-06 ***
+## Q3              -2.12953    2.13565  -0.997  0.32291    
+## Torres_Gemelas   2.34966    2.41149   0.974  0.33400    
+## Crisis_2008      2.78496    1.99205   1.398  0.16752    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 6.026 on 57 degrees of freedom
+## Multiple R-squared:  0.761,  Adjusted R-squared:  0.7358 
+## F-statistic: 30.25 on 6 and 57 DF,  p-value: 5.132e-16</code></pre>
+<pre class="r"><code>library(olsrr)
+ols_test_normality(rm.modelo2)     #Normalidad</code></pre>
+<pre><code>## -----------------------------------------------
+##        Test             Statistic       pvalue  
+## -----------------------------------------------
+## Shapiro-Wilk              0.922           6e-04 
+## Kolmogorov-Smirnov        0.154          0.0862 
+## Cramer-von Mises          6.1782         0.0000 
+## Anderson-Darling          1.366          0.0014 
+## -----------------------------------------------</code></pre>
+<pre class="r"><code>mean(rm.modelo2$residuals)</code></pre>
+<pre><code>## [1] -5.827587e-17</code></pre>
+<pre class="r"><code>car::dwt(rm.modelo2)               #Ho no autocorrelación de residuos</code></pre>
+<pre><code>##  lag Autocorrelation D-W Statistic p-value
+##    1       0.5461075     0.6833958       0
+##  Alternative hypothesis: rho != 0</code></pre>
+<pre class="r"><code>ols_test_breusch_pagan(rm.modelo2) #Homosedasticidad</code></pre>
+<pre><code>## 
+##  Breusch Pagan Test for Heteroskedasticity
+##  -----------------------------------------
+##  Ho: the variance is constant            
+##  Ha: the variance is not constant        
+## 
+##                 Data                 
+##  ------------------------------------
+##  Response : Turistas 
+##  Variables: fitted values of Turistas 
+## 
+##         Test Summary          
+##  -----------------------------
+##  DF            =    1 
+##  Chi2          =    4.588152 
+##  Prob &gt; Chi2   =    0.03219371</code></pre>
+<pre class="r"><code>ols_plot_resid_stand(rm.modelo2)</code></pre>
+<p><img src="regresion_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+<pre class="r"><code>ols_plot_resid_fit(rm.modelo2)</code></pre>
+<p><img src="regresion_files/figure-html/unnamed-chunk-9-2.png" width="672" /></p>
+</div>
+<div id="section-22" class="section level3">
+<h3></h3>
+</div>
+<div id="modelo-3-1" class="section level3">
+<h3>Modelo 3</h3>
+</div>
+<div id="section-23" class="section level3">
+<h3></h3>
+<pre class="r"><code>rm.modelo3 &lt;- lm(Turistas ~ US_GDP + Q1 + Q2 + Q3 + Torres_Gemelas + Crisis_2008, 
+                 data = datos.panel.training)
+rm.modelo3</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = Turistas ~ US_GDP + Q1 + Q2 + Q3 + Torres_Gemelas + 
+##     Crisis_2008, data = datos.panel.training)
+## 
+## Coefficients:
+##    (Intercept)          US_GDP              Q1              Q2  
+##      -13.78765         0.00431         7.64269       -10.72031  
+##             Q3  Torres_Gemelas     Crisis_2008  
+##       -3.27766        -5.13946         1.78487</code></pre>
+<pre class="r"><code>summary(rm.modelo3)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = Turistas ~ US_GDP + Q1 + Q2 + Q3 + Torres_Gemelas + 
+##     Crisis_2008, data = datos.panel.training)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -5.9412 -2.0917 -0.4231  1.8723  6.4172 
+## 
+## Coefficients:
+##                  Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)    -1.379e+01  2.317e+00  -5.950 1.74e-07 ***
+## US_GDP          4.309e-03  1.999e-04  21.559  &lt; 2e-16 ***
+## Q1              7.643e+00  1.011e+00   7.556 3.76e-10 ***
+## Q2             -1.072e+01  1.011e+00 -10.603 4.21e-15 ***
+## Q3             -3.278e+00  1.011e+00  -3.240 0.001994 ** 
+## Torres_Gemelas -5.139e+00  1.261e+00  -4.077 0.000143 ***
+## Crisis_2008     1.785e+00  9.461e-01   1.887 0.064315 .  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 2.855 on 57 degrees of freedom
+## Multiple R-squared:  0.9464, Adjusted R-squared:  0.9407 
+## F-statistic: 167.6 on 6 and 57 DF,  p-value: &lt; 2.2e-16</code></pre>
+<pre class="r"><code>library(olsrr)
+ols_test_normality(rm.modelo3)     #Normalidad</code></pre>
+<pre><code>## -----------------------------------------------
+##        Test             Statistic       pvalue  
+## -----------------------------------------------
+## Shapiro-Wilk              0.9821         0.4796 
+## Kolmogorov-Smirnov        0.0877         0.6751 
+## Cramer-von Mises          4.9353         0.0000 
+## Anderson-Darling          0.4647         0.2465 
+## -----------------------------------------------</code></pre>
+<pre class="r"><code>mean(rm.modelo3$residuals)</code></pre>
+<pre><code>## [1] 2.081668e-16</code></pre>
+<pre class="r"><code>car::dwt(rm.modelo3)               #Ho no autocorrelación de residuos</code></pre>
+<pre><code>##  lag Autocorrelation D-W Statistic p-value
+##    1       0.0890622      1.767884    0.22
+##  Alternative hypothesis: rho != 0</code></pre>
+<pre class="r"><code>ols_test_breusch_pagan(rm.modelo3) #Homosedasticidad</code></pre>
+<pre><code>## 
+##  Breusch Pagan Test for Heteroskedasticity
+##  -----------------------------------------
+##  Ho: the variance is constant            
+##  Ha: the variance is not constant        
+## 
+##                 Data                 
+##  ------------------------------------
+##  Response : Turistas 
+##  Variables: fitted values of Turistas 
+## 
+##          Test Summary          
+##  ------------------------------
+##  DF            =    1 
+##  Chi2          =    0.000662221 
+##  Prob &gt; Chi2   =    0.9794698</code></pre>
+<pre class="r"><code>ols_plot_resid_stand(rm.modelo3)</code></pre>
+<p><img src="regresion_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+<pre class="r"><code>ols_plot_resid_fit(rm.modelo3)</code></pre>
+<p><img src="regresion_files/figure-html/unnamed-chunk-10-2.png" width="672" /></p>
+</div>
+<div id="section-24" class="section level3">
+<h3></h3>
+</div>
+<div id="modelo-4-1" class="section level3">
+<h3>Modelo 4</h3>
+</div>
+<div id="section-25" class="section level3">
+<h3></h3>
+<pre class="r"><code>rm.modelo4 &lt;- lm(Turistas ~ China_GDP + Q1 + Q2 + Q3 + Torres_Gemelas + Crisis_2008, 
+                 data = datos.panel.training)
+rm.modelo4</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = Turistas ~ China_GDP + Q1 + Q2 + Q3 + Torres_Gemelas + 
+##     Crisis_2008, data = datos.panel.training)
+## 
+## Coefficients:
+##    (Intercept)       China_GDP              Q1              Q2  
+##      2.669e+01       1.938e-12       6.462e+00      -1.218e+01  
+##             Q3  Torres_Gemelas     Crisis_2008  
+##     -5.762e+00       9.559e-01       1.300e+00</code></pre>
+<pre class="r"><code>summary(rm.modelo4)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = Turistas ~ China_GDP + Q1 + Q2 + Q3 + Torres_Gemelas + 
+##     Crisis_2008, data = datos.panel.training)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -7.2764 -2.1828  0.1869  2.0994  5.0080 
+## 
+## Coefficients:
+##                  Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)     2.669e+01  1.123e+00  23.769  &lt; 2e-16 ***
+## China_GDP       1.938e-12  9.136e-14  21.217  &lt; 2e-16 ***
+## Q1              6.462e+00  1.026e+00   6.298 4.65e-08 ***
+## Q2             -1.218e+01  1.028e+00 -11.848  &lt; 2e-16 ***
+## Q3             -5.762e+00  1.036e+00  -5.562 7.41e-07 ***
+## Torres_Gemelas  9.559e-01  1.119e+00   0.855    0.396    
+## Crisis_2008     1.300e+00  9.631e-01   1.350    0.182    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 2.895 on 57 degrees of freedom
+## Multiple R-squared:  0.9448, Adjusted R-squared:  0.939 
+## F-statistic: 162.7 on 6 and 57 DF,  p-value: &lt; 2.2e-16</code></pre>
+<pre class="r"><code>library(olsrr)
+ols_test_normality(rm.modelo4)     #Normalidad</code></pre>
+<pre><code>## -----------------------------------------------
+##        Test             Statistic       pvalue  
+## -----------------------------------------------
+## Shapiro-Wilk              0.9856         0.6644 
+## Kolmogorov-Smirnov        0.0616         0.9559 
+## Cramer-von Mises          3.8258         0.0000 
+## Anderson-Darling          0.2024         0.8734 
+## -----------------------------------------------</code></pre>
+<pre class="r"><code>mean(rm.modelo4$residuals)</code></pre>
+<pre><code>## [1] -1.00614e-16</code></pre>
+<pre class="r"><code>car::dwt(rm.modelo4)               #Ho no autocorrelación de residuos</code></pre>
+<pre><code>##  lag Autocorrelation D-W Statistic p-value
+##    1      0.03631128      1.799023    0.31
+##  Alternative hypothesis: rho != 0</code></pre>
+<pre class="r"><code>ols_test_breusch_pagan(rm.modelo4) #Homosedasticidad</code></pre>
+<pre><code>## 
+##  Breusch Pagan Test for Heteroskedasticity
+##  -----------------------------------------
+##  Ho: the variance is constant            
+##  Ha: the variance is not constant        
+## 
+##                 Data                 
+##  ------------------------------------
+##  Response : Turistas 
+##  Variables: fitted values of Turistas 
+## 
+##          Test Summary           
+##  -------------------------------
+##  DF            =    1 
+##  Chi2          =    0.0001126285 
+##  Prob &gt; Chi2   =    0.9915325</code></pre>
+<pre class="r"><code>ols_plot_resid_stand(rm.modelo4)</code></pre>
+<p><img src="regresion_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
+<pre class="r"><code>ols_plot_resid_fit(rm.modelo4)</code></pre>
+<p><img src="regresion_files/figure-html/unnamed-chunk-11-2.png" width="672" /></p>
+<p>Sin hacer un análisis detallado de cada modelo, es claro que la variable Crisis_2008 no es significativa en ninguno de ellos, por lo que se procederá a eliminarla y se volverá a contruir todos los modelos de regresión múltiple.</p>
+</div>
+<div id="section-26" class="section level3">
+<h3></h3>
+</div>
+<div id="modelo-5" class="section level3">
+<h3>Modelo 5</h3>
+</div>
+<div id="section-27" class="section level3">
+<h3></h3>
+<pre class="r"><code>rm.modelo5 &lt;- lm(Turistas ~ t + Q1 + Q2 + Q3 + Torres_Gemelas, 
+                 data = datos.panel.training)
+rm.modelo5</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = Turistas ~ t + Q1 + Q2 + Q3 + Torres_Gemelas, data = datos.panel.training)
+## 
+## Coefficients:
+##    (Intercept)               t              Q1              Q2  
+##        26.7462          0.5744          7.7099        -10.6268  
+##             Q3  Torres_Gemelas  
+##        -3.1744         -5.1632</code></pre>
+<pre class="r"><code>summary(rm.modelo5)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = Turistas ~ t + Q1 + Q2 + Q3 + Torres_Gemelas, data = datos.panel.training)
+## 
+## Residuals:
+##    Min     1Q Median     3Q    Max 
+## -5.251 -1.448 -0.029  1.453  4.827 
+## 
+## Coefficients:
+##                Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)     26.7462     0.9254  28.902  &lt; 2e-16 ***
+## t                0.5744     0.0214  26.842  &lt; 2e-16 ***
+## Q1               7.7099     0.8469   9.104 8.94e-13 ***
+## Q2             -10.6268     0.8466 -12.552  &lt; 2e-16 ***
+## Q3              -3.1744     0.8469  -3.748 0.000412 ***
+## Torres_Gemelas  -5.1632     1.0485  -4.924 7.39e-06 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 2.39 on 58 degrees of freedom
+## Multiple R-squared:  0.9617, Adjusted R-squared:  0.9584 
+## F-statistic: 291.5 on 5 and 58 DF,  p-value: &lt; 2.2e-16</code></pre>
+<pre class="r"><code>ms5 &lt;- summary(rm.modelo5)
+
+library(olsrr)
+ols_test_normality(rm.modelo5)     #Normalidad</code></pre>
+<pre><code>## -----------------------------------------------
+##        Test             Statistic       pvalue  
+## -----------------------------------------------
+## Shapiro-Wilk               0.99          0.8866 
+## Kolmogorov-Smirnov        0.0498         0.9951 
+## Cramer-von Mises          4.2186         0.0000 
+## Anderson-Darling          0.1476         0.9638 
+## -----------------------------------------------</code></pre>
+<pre class="r"><code>mean(rm.modelo5$residuals)</code></pre>
+<pre><code>## [1] -3.564857e-16</code></pre>
+<pre class="r"><code>car::dwt(rm.modelo5)               #Ho no autocorrelación de residuos</code></pre>
+<pre><code>##  lag Autocorrelation D-W Statistic p-value
+##    1      -0.2445895       2.40769   0.132
+##  Alternative hypothesis: rho != 0</code></pre>
+<pre class="r"><code>ols_test_breusch_pagan(rm.modelo5) #Homosedasticidad</code></pre>
+<pre><code>## 
+##  Breusch Pagan Test for Heteroskedasticity
+##  -----------------------------------------
+##  Ho: the variance is constant            
+##  Ha: the variance is not constant        
+## 
+##                 Data                 
+##  ------------------------------------
+##  Response : Turistas 
+##  Variables: fitted values of Turistas 
+## 
+##         Test Summary         
+##  ----------------------------
+##  DF            =    1 
+##  Chi2          =    0.1171086 
+##  Prob &gt; Chi2   =    0.7321919</code></pre>
+<pre class="r"><code>ols_plot_resid_stand(rm.modelo5)</code></pre>
+<p><img src="regresion_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
+<pre class="r"><code>ols_plot_resid_fit(rm.modelo5)</code></pre>
+<p><img src="regresion_files/figure-html/unnamed-chunk-12-2.png" width="672" /></p>
+<p>El modelo 5 es ACEPTABLE, todos los componentes son significativos y cumple todos los supuestos.</p>
+</div>
+<div id="section-28" class="section level3">
+<h3></h3>
+</div>
+<div id="modelo-6" class="section level3">
+<h3>Modelo 6</h3>
+</div>
+<div id="section-29" class="section level3">
+<h3></h3>
+<pre class="r"><code>rm.modelo6 &lt;- lm(Turistas ~ Brent_Price + Q1 + Q2 + Q3 + Torres_Gemelas, 
+                 data = datos.panel.training)
+rm.modelo6</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = Turistas ~ Brent_Price + Q1 + Q2 + Q3 + Torres_Gemelas, 
+##     data = datos.panel.training)
+## 
+## Coefficients:
+##    (Intercept)     Brent_Price              Q1              Q2  
+##        25.2952          0.2123          6.4077        -11.0306  
+##             Q3  Torres_Gemelas  
+##        -2.0791          2.7664</code></pre>
+<pre class="r"><code>summary(rm.modelo6)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = Turistas ~ Brent_Price + Q1 + Q2 + Q3 + Torres_Gemelas, 
+##     data = datos.panel.training)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -12.6146  -3.6499  -0.5197   3.1719  20.3745 
+## 
+## Coefficients:
+##                 Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)     25.29518    2.41034  10.494 5.03e-15 ***
+## Brent_Price      0.21230    0.02685   7.906 8.81e-11 ***
+## Q1               6.40770    2.15381   2.975  0.00426 ** 
+## Q2             -11.03061    2.15245  -5.125 3.57e-06 ***
+## Q3              -2.07910    2.15285  -0.966  0.33818    
+## Torres_Gemelas   2.76640    2.41260   1.147  0.25624    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 6.076 on 58 degrees of freedom
+## Multiple R-squared:  0.7528, Adjusted R-squared:  0.7315 
+## F-statistic: 35.32 on 5 and 58 DF,  p-value: &lt; 2.2e-16</code></pre>
+<pre class="r"><code>library(olsrr)
+ols_test_normality(rm.modelo6)     #Normalidad</code></pre>
+<pre><code>## -----------------------------------------------
+##        Test             Statistic       pvalue  
+## -----------------------------------------------
+## Shapiro-Wilk              0.9406         0.0040 
+## Kolmogorov-Smirnov        0.1269         0.2336 
+## Cramer-von Mises          5.9122         0.0000 
+## Anderson-Darling          1.0472         0.0088 
+## -----------------------------------------------</code></pre>
+<pre class="r"><code>mean(rm.modelo6$residuals)</code></pre>
+<pre><code>## [1] 3.621235e-17</code></pre>
+<pre class="r"><code>car::dwt(rm.modelo6)               #Ho no autocorrelación de residuos</code></pre>
+<pre><code>##  lag Autocorrelation D-W Statistic p-value
+##    1       0.5458303     0.7015715       0
+##  Alternative hypothesis: rho != 0</code></pre>
+<pre class="r"><code>ols_test_breusch_pagan(rm.modelo6) #Homosedasticidad</code></pre>
+<pre><code>## 
+##  Breusch Pagan Test for Heteroskedasticity
+##  -----------------------------------------
+##  Ho: the variance is constant            
+##  Ha: the variance is not constant        
+## 
+##                 Data                 
+##  ------------------------------------
+##  Response : Turistas 
+##  Variables: fitted values of Turistas 
+## 
+##         Test Summary          
+##  -----------------------------
+##  DF            =    1 
+##  Chi2          =    4.881161 
+##  Prob &gt; Chi2   =    0.02715135</code></pre>
+<pre class="r"><code>ols_plot_resid_stand(rm.modelo6)</code></pre>
+<p><img src="regresion_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
+<pre class="r"><code>ols_plot_resid_fit(rm.modelo6)</code></pre>
+<p><img src="regresion_files/figure-html/unnamed-chunk-13-2.png" width="672" /></p>
+<p>El modelo 6 NO es aceptable, pues dos de sus componentes no son significativos.</p>
+</div>
+<div id="section-30" class="section level3">
+<h3></h3>
+</div>
+<div id="modelo-7" class="section level3">
+<h3>Modelo 7</h3>
+</div>
+<div id="section-31" class="section level3">
+<h3></h3>
+<pre class="r"><code>rm.modelo7 &lt;- lm(Turistas ~ US_GDP + Q1 + Q2 + Q3 + Torres_Gemelas, 
+                 data = datos.panel.training)
+rm.modelo7</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = Turistas ~ US_GDP + Q1 + Q2 + Q3 + Torres_Gemelas, 
+##     data = datos.panel.training)
+## 
+## Coefficients:
+##    (Intercept)          US_GDP              Q1              Q2  
+##     -14.339993        0.004362        7.674512      -10.695745  
+##             Q3  Torres_Gemelas  
+##      -3.260152       -4.950089</code></pre>
+<pre class="r"><code>summary(rm.modelo7)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = Turistas ~ US_GDP + Q1 + Q2 + Q3 + Torres_Gemelas, 
+##     data = datos.panel.training)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -5.9542 -2.1834  0.1135  1.8294  6.0901 
+## 
+## Coefficients:
+##                  Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)    -1.434e+01  2.349e+00  -6.105 9.13e-08 ***
+## US_GDP          4.362e-03  2.023e-04  21.560  &lt; 2e-16 ***
+## Q1              7.675e+00  1.033e+00   7.427 5.62e-10 ***
+## Q2             -1.070e+01  1.033e+00 -10.354 8.43e-15 ***
+## Q3             -3.260e+00  1.034e+00  -3.154 0.002548 ** 
+## Torres_Gemelas -4.950e+00  1.284e+00  -3.855 0.000292 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 2.917 on 58 degrees of freedom
+## Multiple R-squared:  0.943,  Adjusted R-squared:  0.9381 
+## F-statistic:   192 on 5 and 58 DF,  p-value: &lt; 2.2e-16</code></pre>
+<pre class="r"><code>ms7 &lt;- summary(rm.modelo7)
+
+library(olsrr)
+ols_test_normality(rm.modelo7)     #Normalidad</code></pre>
+<pre><code>## -----------------------------------------------
+##        Test             Statistic       pvalue  
+## -----------------------------------------------
+## Shapiro-Wilk              0.9852         0.6416 
+## Kolmogorov-Smirnov        0.0734         0.8558 
+## Cramer-von Mises          3.6258         0.0000 
+## Anderson-Darling          0.2635         0.6889 
+## -----------------------------------------------</code></pre>
+<pre class="r"><code>mean(rm.modelo7$residuals)</code></pre>
+<pre><code>## [1] -1.605703e-16</code></pre>
+<pre class="r"><code>car::dwt(rm.modelo7)               #Ho no autocorrelación de residuos</code></pre>
+<pre><code>##  lag Autocorrelation D-W Statistic p-value
+##    1       0.1394375      1.673047   0.142
+##  Alternative hypothesis: rho != 0</code></pre>
+<pre class="r"><code>ols_test_breusch_pagan(rm.modelo7) #Homosedasticidad</code></pre>
+<pre><code>## 
+##  Breusch Pagan Test for Heteroskedasticity
+##  -----------------------------------------
+##  Ho: the variance is constant            
+##  Ha: the variance is not constant        
+## 
+##                 Data                 
+##  ------------------------------------
+##  Response : Turistas 
+##  Variables: fitted values of Turistas 
+## 
+##         Test Summary          
+##  -----------------------------
+##  DF            =    1 
+##  Chi2          =    0.09594842 
+##  Prob &gt; Chi2   =    0.756747</code></pre>
+<pre class="r"><code>ols_plot_resid_stand(rm.modelo7)</code></pre>
+<p><img src="regresion_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
+<pre class="r"><code>ols_plot_resid_fit(rm.modelo7)</code></pre>
+<p><img src="regresion_files/figure-html/unnamed-chunk-14-2.png" width="672" /></p>
+<p>El modelo 7 es ACEPTABLE, todos los componentes son significativos y cumple todos los supuestos.</p>
+</div>
+<div id="section-32" class="section level3">
+<h3></h3>
+</div>
+<div id="modelo-8" class="section level3">
+<h3>Modelo 8</h3>
+</div>
+<div id="section-33" class="section level3">
+<h3></h3>
+<pre class="r"><code>rm.modelo8 &lt;- lm(Turistas ~ China_GDP + Q1 + Q2 + Q3 + Torres_Gemelas, 
+                 data = datos.panel.training)
+rm.modelo8</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = Turistas ~ China_GDP + Q1 + Q2 + Q3 + Torres_Gemelas, 
+##     data = datos.panel.training)
+## 
+## Coefficients:
+##    (Intercept)       China_GDP              Q1              Q2  
+##      2.664e+01       1.958e-12       6.473e+00      -1.218e+01  
+##             Q3  Torres_Gemelas  
+##     -5.776e+00       1.129e+00</code></pre>
+<pre class="r"><code>summary(rm.modelo8)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = Turistas ~ China_GDP + Q1 + Q2 + Q3 + Torres_Gemelas, 
+##     data = datos.panel.training)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -7.2798 -1.8758  0.2009  1.9947  5.8840 
+## 
+## Coefficients:
+##                  Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)     2.664e+01  1.130e+00  23.571  &lt; 2e-16 ***
+## China_GDP       1.958e-12  9.079e-14  21.568  &lt; 2e-16 ***
+## Q1              6.473e+00  1.033e+00   6.266 4.95e-08 ***
+## Q2             -1.218e+01  1.035e+00 -11.763  &lt; 2e-16 ***
+## Q3             -5.776e+00  1.043e+00  -5.537 7.80e-07 ***
+## Torres_Gemelas  1.129e+00  1.119e+00   1.009    0.317    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 2.916 on 58 degrees of freedom
+## Multiple R-squared:  0.9431, Adjusted R-squared:  0.9382 
+## F-statistic: 192.1 on 5 and 58 DF,  p-value: &lt; 2.2e-16</code></pre>
+<pre class="r"><code>library(olsrr)
+ols_test_normality(rm.modelo8)     #Normalidad</code></pre>
+<pre><code>## -----------------------------------------------
+##        Test             Statistic       pvalue  
+## -----------------------------------------------
+## Shapiro-Wilk              0.9876         0.7732 
+## Kolmogorov-Smirnov        0.0794         0.7853 
+## Cramer-von Mises          3.5928         0.0000 
+## Anderson-Darling          0.2967         0.5815 
+## -----------------------------------------------</code></pre>
+<pre class="r"><code>mean(rm.modelo8$residuals)</code></pre>
+<pre><code>## [1] -3.721659e-16</code></pre>
+<pre class="r"><code>car::dwt(rm.modelo8)               #Ho no autocorrelación de residuos</code></pre>
+<pre><code>##  lag Autocorrelation D-W Statistic p-value
+##    1      0.06381578      1.752494    0.27
+##  Alternative hypothesis: rho != 0</code></pre>
+<pre class="r"><code>ols_test_breusch_pagan(rm.modelo8) #Homosedasticidad</code></pre>
+<pre><code>## 
+##  Breusch Pagan Test for Heteroskedasticity
+##  -----------------------------------------
+##  Ho: the variance is constant            
+##  Ha: the variance is not constant        
+## 
+##                 Data                 
+##  ------------------------------------
+##  Response : Turistas 
+##  Variables: fitted values of Turistas 
+## 
+##         Test Summary          
+##  -----------------------------
+##  DF            =    1 
+##  Chi2          =    0.06368474 
+##  Prob &gt; Chi2   =    0.8007641</code></pre>
+<pre class="r"><code>ols_plot_resid_stand(rm.modelo8)</code></pre>
+<p><img src="regresion_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
+<pre class="r"><code>ols_plot_resid_fit(rm.modelo8)</code></pre>
+<p><img src="regresion_files/figure-html/unnamed-chunk-15-2.png" width="672" /></p>
+<p>El modelo 8 NO es aceptable, pues el componente Torres_Gemelas no es significativo.</p>
+<p>Se procederá a rehacer los modelos 6 y 8 eliminando los componentes no significativos.</p>
+</div>
+<div id="section-34" class="section level3">
+<h3></h3>
+</div>
+<div id="modelo-9" class="section level3">
+<h3>Modelo 9</h3>
+</div>
+<div id="section-35" class="section level3">
+<h3></h3>
+<pre class="r"><code>rm.modelo9 &lt;- lm(Turistas ~ Brent_Price + Q1 + Q2, 
+                 data = datos.panel.training)
+rm.modelo9</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = Turistas ~ Brent_Price + Q1 + Q2, data = datos.panel.training)
+## 
+## Coefficients:
+## (Intercept)  Brent_Price           Q1           Q2  
+##     25.4382       0.2305       7.3042     -10.1064</code></pre>
+<pre class="r"><code>summary(rm.modelo9)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = Turistas ~ Brent_Price + Q1 + Q2, data = datos.panel.training)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -13.403  -3.315  -1.167   1.719  22.022 
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  25.43824    1.78622  14.241  &lt; 2e-16 ***
+## Brent_Price   0.23047    0.02249  10.249 8.36e-15 ***
+## Q1            7.30416    1.86663   3.913 0.000235 ***
+## Q2          -10.10641    1.86566  -5.417 1.13e-06 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 6.092 on 60 degrees of freedom
+## Multiple R-squared:  0.7429, Adjusted R-squared:   0.73 
+## F-statistic: 57.79 on 3 and 60 DF,  p-value: &lt; 2.2e-16</code></pre>
+<pre class="r"><code>library(olsrr)
+ols_test_normality(rm.modelo9)     #Normalidad</code></pre>
+<pre><code>## -----------------------------------------------
+##        Test             Statistic       pvalue  
+## -----------------------------------------------
+## Shapiro-Wilk              0.937          0.0028 
+## Kolmogorov-Smirnov        0.1477         0.1106 
+## Cramer-von Mises          4.6087         0.0000 
+## Anderson-Darling          1.1538         0.0048 
+## -----------------------------------------------</code></pre>
+<pre class="r"><code>mean(rm.modelo9$residuals)</code></pre>
+<pre><code>## [1] 2.35814e-17</code></pre>
+<pre class="r"><code>car::dwt(rm.modelo9)               #Ho no autocorrelación de residuos</code></pre>
+<pre><code>##  lag Autocorrelation D-W Statistic p-value
+##    1       0.5168657      0.728911       0
+##  Alternative hypothesis: rho != 0</code></pre>
+<pre class="r"><code>ols_test_breusch_pagan(rm.modelo9) #Homosedasticidad</code></pre>
+<pre><code>## 
+##  Breusch Pagan Test for Heteroskedasticity
+##  -----------------------------------------
+##  Ho: the variance is constant            
+##  Ha: the variance is not constant        
+## 
+##                 Data                 
+##  ------------------------------------
+##  Response : Turistas 
+##  Variables: fitted values of Turistas 
+## 
+##         Test Summary          
+##  -----------------------------
+##  DF            =    1 
+##  Chi2          =    4.89436 
+##  Prob &gt; Chi2   =    0.02694456</code></pre>
+<pre class="r"><code>ols_plot_resid_stand(rm.modelo9)</code></pre>
+<p><img src="regresion_files/figure-html/unnamed-chunk-16-1.png" width="672" /></p>
+<pre class="r"><code>ols_plot_resid_fit(rm.modelo9)</code></pre>
+<p><img src="regresion_files/figure-html/unnamed-chunk-16-2.png" width="672" /></p>
+<p>El modelo 9 NO es aceptable, pues los residuos están autocorrelacionados y no cumple con el supuesto de homosedasticidad.</p>
+</div>
+<div id="section-36" class="section level3">
+<h3></h3>
+</div>
+<div id="modelo-10" class="section level3">
+<h3>Modelo 10</h3>
+</div>
+<div id="section-37" class="section level3">
+<h3></h3>
+<pre class="r"><code>rm.modelo10 &lt;- lm(Turistas ~ China_GDP + Q1 + Q2 + Q3, 
+                 data = datos.panel.training)
+rm.modelo10</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = Turistas ~ China_GDP + Q1 + Q2 + Q3, data = datos.panel.training)
+## 
+## Coefficients:
+## (Intercept)    China_GDP           Q1           Q2           Q3  
+##   2.729e+01    2.004e-12    6.405e+00   -1.227e+01   -5.903e+00</code></pre>
+<pre class="r"><code>summary(rm.modelo10)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = Turistas ~ China_GDP + Q1 + Q2 + Q3, data = datos.panel.training)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -7.9670 -2.0323  0.3264  2.1698  5.9688 
+## 
+## Coefficients:
+##               Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  2.729e+01  9.238e-01  29.544  &lt; 2e-16 ***
+## China_GDP    2.004e-12  7.860e-14  25.498  &lt; 2e-16 ***
+## Q1           6.405e+00  1.031e+00   6.212 5.74e-08 ***
+## Q2          -1.227e+01  1.032e+00 -11.890  &lt; 2e-16 ***
+## Q3          -5.903e+00  1.036e+00  -5.700 4.05e-07 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 2.916 on 59 degrees of freedom
+## Multiple R-squared:  0.9421, Adjusted R-squared:  0.9381 
+## F-statistic: 239.8 on 4 and 59 DF,  p-value: &lt; 2.2e-16</code></pre>
+<pre class="r"><code>ms10 &lt;- summary(rm.modelo10)
+
+
+library(olsrr)
+ols_test_normality(rm.modelo10)     #Normalidad</code></pre>
+<pre><code>## -----------------------------------------------
+##        Test             Statistic       pvalue  
+## -----------------------------------------------
+## Shapiro-Wilk              0.9813         0.4413 
+## Kolmogorov-Smirnov        0.102          0.4873 
+## Cramer-von Mises          3.183          0.0000 
+## Anderson-Darling          0.4476         0.2714 
+## -----------------------------------------------</code></pre>
+<pre class="r"><code>mean(rm.modelo10$residuals)</code></pre>
+<pre><code>## [1] 5.551115e-17</code></pre>
+<pre class="r"><code>car::dwt(rm.modelo10)               #Ho no autocorrelación de residuos</code></pre>
+<pre><code>##  lag Autocorrelation D-W Statistic p-value
+##    1       0.0844588      1.694476   0.236
+##  Alternative hypothesis: rho != 0</code></pre>
+<pre class="r"><code>ols_test_breusch_pagan(rm.modelo10) #Homosedasticidad</code></pre>
+<pre><code>## 
+##  Breusch Pagan Test for Heteroskedasticity
+##  -----------------------------------------
+##  Ho: the variance is constant            
+##  Ha: the variance is not constant        
+## 
+##                 Data                 
+##  ------------------------------------
+##  Response : Turistas 
+##  Variables: fitted values of Turistas 
+## 
+##         Test Summary         
+##  ----------------------------
+##  DF            =    1 
+##  Chi2          =    0.3320627 
+##  Prob &gt; Chi2   =    0.564447</code></pre>
+<pre class="r"><code>ols_plot_resid_stand(rm.modelo10)</code></pre>
+<p><img src="regresion_files/figure-html/unnamed-chunk-17-1.png" width="672" /></p>
+<pre class="r"><code>ols_plot_resid_fit(rm.modelo10)</code></pre>
+<p><img src="regresion_files/figure-html/unnamed-chunk-17-2.png" width="672" /></p>
+<p>El modelo 10 es ACEPTABLE, todos los componentes son significativos y cumple todos los supuestos.</p>
+<p>En resumen, de los modelos de regresión múltiple construidos, los aceptables son:</p>
+<ul>
+<li>Modelo 5 con R<sup>2</sup> ajustado de 0.9584354</li>
+<li>Modelo 7 con R<sup>2</sup> ajustado de 0.938112</li>
+<li>Modelo 10 con R<sup>2</sup> ajustado de 0.9381336</li>
+</ul>
+<p>Con base en el R<sup>2</sup> ajustado, el mejor modelo de regresión múltiple es el modelo 5.</p>
+</div>
+</div>
+<div id="section-38" class="section level2">
+<h2></h2>
+</div>
+<div id="evaluacion-con-error-de-pronostico" class="section level2">
+<h2>6. Evaluación con error de pronóstico</h2>
+</div>
+<div id="section-39" class="section level2">
+<h2></h2>
+<div id="calculo-del-error-de-pronostico-con-el-mejor-modelo-de-regresion-simple" class="section level3">
+<h3>Cálculo del error de pronóstico con el mejor modelo de regresión simple</h3>
+</div>
+<div id="section-40" class="section level3">
+<h3></h3>
+<pre class="r"><code>nuevas.xs &lt;- data.frame(x = datos.panel.test[,2])
+nuevas.xs</code></pre>
+<pre><code>##    x
+## 1 65
+## 2 66
+## 3 67
+## 4 68</code></pre>
+<pre class="r"><code>pronostico.rs &lt;- predict(rs.modelo1, newdata =  nuevas.xs)
+pronostico.rs</code></pre>
+<pre><code>##        1        2        3        4 
+## 64.48764 65.74770 67.00777 68.26783</code></pre>
+<pre class="r"><code>mae.rs &lt;- Metrics::mae(datos.test, pronostico.rs)
+mse.rs &lt;- Metrics::mse(datos.test, pronostico.rs)
+errores.rs &lt;- c(mae.rs, mse.rs)
+errores.rs &lt;- matrix(errores.rs, 1, 2)
+colnames(errores.rs) &lt;- c(&quot;MAE&quot;, &quot;MSE&quot;)
+rownames(errores.rs) &lt;- &quot;Mejor Reg Simple&quot;
+knitr::kable(errores.rs)</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th></th>
+<th align="right">MAE</th>
+<th align="right">MSE</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Mejor Reg Simple</td>
+<td align="right">8.735633</td>
+<td align="right">110.6412</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>pronostico.rs.ts &lt;- ts(pronostico.rs, start = c(2015,1), frequency = 4)
+pronostico.rs.ts</code></pre>
+<pre><code>##          Qtr1     Qtr2     Qtr3     Qtr4
+## 2015 64.48764 65.74770 67.00777 68.26783</code></pre>
+<pre class="r"><code>datos.graf.rs &lt;- cbind(datos.training, pronostico.rs.ts)
+autoplot(datos.graf.rs)</code></pre>
+<p><img src="regresion_files/figure-html/unnamed-chunk-18-1.png" width="672" /></p>
+</div>
+<div id="calculo-del-error-de-pronostico-con-el-mejor-modelo-de-regresion-multiple" class="section level3">
+<h3>Cálculo del error de pronóstico con el mejor modelo de regresión múltiple</h3>
+</div>
+<div id="section-41" class="section level3">
+<h3></h3>
+<pre class="r"><code>nuevas.xm &lt;- data.frame(t  &lt;- datos.panel.test[, 2],
+                        Q1 &lt;- datos.panel.test[,4],
+                        Q2 &lt;- datos.panel.test[,5],
+                        Q3 &lt;- datos.panel.test[,6],
+                        Torres_Gemelas &lt;- datos.panel.test[,7])
+                        
+nuevas.xm</code></pre>
+<pre><code>##   t....datos.panel.test...2. Q1....datos.panel.test...4.
+## 1                         65                           1
+## 2                         66                           0
+## 3                         67                           0
+## 4                         68                           0
+##   Q2....datos.panel.test...5. Q3....datos.panel.test...6.
+## 1                           0                           0
+## 2                           1                           0
+## 3                           0                           1
+## 4                           0                           0
+##   Torres_Gemelas....datos.panel.test...7.
+## 1                                       1
+## 2                                       1
+## 3                                       1
+## 4                                       1</code></pre>
+<pre class="r"><code>pronostico.rm &lt;- predict(rm.modelo5, newdata =  nuevas.x)
+pronostico.rm</code></pre>
+<pre><code>##        1        2        3        4 
+## 66.62621 48.86388 56.89070 60.63941</code></pre>
+<pre class="r"><code>mae.rm &lt;- Metrics::mae(datos.test, pronostico.rm)
+mse.rm &lt;- Metrics::mse(datos.test, pronostico.rm)
+errores.rm &lt;- c(mae.rm, mse.rm)
+errores.rm &lt;- matrix(errores.rm, 1, 2)
+colnames(errores.rm) &lt;- c(&quot;MAE&quot;, &quot;MSE&quot;)
+rownames(errores.rm) &lt;- &quot;Mejor Reg Múltiple&quot;
+knitr::kable(errores.rm)</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th></th>
+<th align="right">MAE</th>
+<th align="right">MSE</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Mejor Reg Múltiple</td>
+<td align="right">4.355374</td>
+<td align="right">23.09162</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>pronostico.rm.ts &lt;- ts(pronostico.rm, start = c(2015,1), frequency = 4)
+pronostico.rm.ts</code></pre>
+<pre><code>##          Qtr1     Qtr2     Qtr3     Qtr4
+## 2015 66.62621 48.86388 56.89070 60.63941</code></pre>
+<pre class="r"><code>datos.graf.rm &lt;- cbind(datos.training, pronostico.rm.ts)
+autoplot(datos.graf.rm)</code></pre>
+<p><img src="regresion_files/figure-html/unnamed-chunk-19-1.png" width="672" /></p>
+</div>
+</div>
+<div id="section-42" class="section level2">
+<h2></h2>
+</div>
+<div id="recomendacion" class="section level2">
+<h2>7. Recomendación</h2>
+</div>
+<div id="section-43" class="section level2">
+<h2></h2>
+<p>Con base en los errores de pronóstico, el mejor modelo de regresión es el modelo 5 de regresión múltimple.</p>
+<pre class="r"><code>errores.regre &lt;- matrix(errores.rm, 1, 2)
+colnames(errores.regre) &lt;- c(&quot;MAE&quot;, &quot;MSE&quot;)
+rownames(errores.regre) &lt;- &quot;Mejor Regresión&quot;
+knitr::kable(errores.regre)</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th></th>
+<th align="right">MAE</th>
+<th align="right">MSE</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Mejor Regresión</td>
+<td align="right">4.355374</td>
+<td align="right">23.09162</td>
+</tr>
+</tbody>
+</table>
 </div>
 
 

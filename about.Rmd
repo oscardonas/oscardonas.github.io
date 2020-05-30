@@ -1,5 +1,5 @@
 ---
-title: "About This Website"
+title: "Acerca de este sitio"
 ---
 
-Más información sobre mi página Web
+Resolución de ejercicios de Pronósticos, v 1.0

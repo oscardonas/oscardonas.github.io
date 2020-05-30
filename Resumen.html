@@ -11,7 +11,7 @@
 
 
 
-<title>Suavización exponencial</title>
+<title>Resumen</title>
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -319,142 +319,15 @@ $(document).ready(function () {
 
 
 
-<h1 class="title toc-ignore">Suavización exponencial</h1>
+<h1 class="title toc-ignore">Resumen</h1>
 
 </div>
 
 
-<div id="section" class="section level2">
-<h2></h2>
-</div>
-<div id="suavizacion-exponencial-usando-ets" class="section level2">
-<h2>1. Suavización exponencial usando ETS</h2>
-</div>
-<div id="section-1" class="section level2">
-<h2></h2>
-<p>Este es el mejor modelo de suavización exponencial recomendado por el método ETS, que toma como criterio el AICc para discriminar entre varios modelos:</p>
-<div id="section-2" class="section level4">
-<h4></h4>
-<pre class="r"><code>a &lt;- ets(datos.training)
-a</code></pre>
-<pre><code>## ETS(M,A,M) 
-## 
-## Call:
-##  ets(y = datos.training) 
-## 
-##   Smoothing parameters:
-##     alpha = 0.4822 
-##     beta  = 1e-04 
-##     gamma = 2e-04 
-## 
-##   Initial states:
-##     l = 23.9382 
-##     b = 0.5517 
-##     s = 1.0378 0.9587 0.769 1.2345
-## 
-##   sigma:  0.0596
-## 
-##      AIC     AICc      BIC 
-## 380.5174 383.8507 399.9473</code></pre>
-<pre class="r"><code>summary(a)</code></pre>
-<pre><code>## ETS(M,A,M) 
-## 
-## Call:
-##  ets(y = datos.training) 
-## 
-##   Smoothing parameters:
-##     alpha = 0.4822 
-##     beta  = 1e-04 
-##     gamma = 2e-04 
-## 
-##   Initial states:
-##     l = 23.9382 
-##     b = 0.5517 
-##     s = 1.0378 0.9587 0.769 1.2345
-## 
-##   sigma:  0.0596
-## 
-##      AIC     AICc      BIC 
-## 380.5174 383.8507 399.9473 
-## 
-## Training set error measures:
-##                       ME     RMSE      MAE        MPE     MAPE      MASE
-## Training set -0.05652145 1.983928 1.486029 -0.4901204 4.094269 0.5317947
-##                     ACF1
-## Training set -0.08978543</code></pre>
-</div>
-</div>
-<div id="section-3" class="section level2">
-<h2></h2>
-</div>
-<div id="calculo-del-pronostico" class="section level2">
-<h2>2. Cálculo del pronóstico</h2>
-</div>
-<div id="section-4" class="section level2">
-<h2></h2>
-<pre class="r"><code>pronostico.ets &lt;- forecast(ets(datos.training), h = 4)
-pronostico.ets</code></pre>
-<pre><code>##         Point Forecast    Lo 80    Hi 80    Lo 95    Hi 95
-## 2015 Q1       71.47892 66.01724 76.94059 63.12600 79.83183
-## 2015 Q2       44.94719 41.13971 48.75467 39.12416 50.77023
-## 2015 Q3       56.56497 51.35296 61.77697 48.59389 64.53604
-## 2015 Q4       61.80727 55.69418 67.92036 52.45811 71.15643</code></pre>
-<pre class="r"><code>summary(pronostico.ets)</code></pre>
-<pre><code>## 
-## Forecast method: ETS(M,A,M)
-## 
-## Model Information:
-## ETS(M,A,M) 
-## 
-## Call:
-##  ets(y = datos.training) 
-## 
-##   Smoothing parameters:
-##     alpha = 0.4822 
-##     beta  = 1e-04 
-##     gamma = 2e-04 
-## 
-##   Initial states:
-##     l = 23.9382 
-##     b = 0.5517 
-##     s = 1.0378 0.9587 0.769 1.2345
-## 
-##   sigma:  0.0596
-## 
-##      AIC     AICc      BIC 
-## 380.5174 383.8507 399.9473 
-## 
-## Error measures:
-##                       ME     RMSE      MAE        MPE     MAPE      MASE
-## Training set -0.05652145 1.983928 1.486029 -0.4901204 4.094269 0.5317947
-##                     ACF1
-## Training set -0.08978543
-## 
-## Forecasts:
-##         Point Forecast    Lo 80    Hi 80    Lo 95    Hi 95
-## 2015 Q1       71.47892 66.01724 76.94059 63.12600 79.83183
-## 2015 Q2       44.94719 41.13971 48.75467 39.12416 50.77023
-## 2015 Q3       56.56497 51.35296 61.77697 48.59389 64.53604
-## 2015 Q4       61.80727 55.69418 67.92036 52.45811 71.15643</code></pre>
-<pre class="r"><code>autoplot(pronostico.ets) +
-  ggtitle(&quot;Mejor pronóstico usando ETS&quot;)</code></pre>
-<p><img src="exposmooth_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
-</div>
-<div id="section-5" class="section level2">
-<h2></h2>
-</div>
-<div id="evaluacion-del-pronostico" class="section level2">
-<h2>3. Evaluación del pronóstico</h2>
-</div>
-<div id="section-6" class="section level2">
-<h2></h2>
-<pre class="r"><code>mae.ets &lt;- Metrics::mae(datos.test, pronostico.ets$mean)
-mse.ets &lt;- Metrics::mse(datos.test, pronostico.ets$mean)
-errores.ets &lt;- c(mae.ets, mse.ets)
-errores.ets &lt;- matrix(errores.ets, 1, 2)
-colnames(errores.ets) &lt;- c(&quot;MAE&quot;, &quot;MSE&quot;)
-rownames(errores.ets) &lt;- &quot;Mejor ETS&quot;
-knitr::kable(errores.ets)</code></pre>
+<div id="resumen-comparativo-de-las-propuestas-en-las-diferentes-tecnicas" class="section level2">
+<h2>1. Resumen comparativo de las propuestas en las diferentes técnicas</h2>
+<pre class="r"><code>resumen &lt;- rbind(errores.regre, errores.mejor.stl, errores.ets, errores.arima)
+knitr::kable(resumen)</code></pre>
 <table>
 <thead>
 <tr class="header">
@@ -465,12 +338,31 @@ knitr::kable(errores.ets)</code></pre>
 </thead>
 <tbody>
 <tr class="odd">
+<td>Mejor Regresión</td>
+<td align="right">4.355374</td>
+<td align="right">23.091623</td>
+</tr>
+<tr class="even">
+<td>Mejor STL (RWDrift)</td>
+<td align="right">2.459400</td>
+<td align="right">7.052524</td>
+</tr>
+<tr class="odd">
 <td>Mejor ETS</td>
 <td align="right">3.327208</td>
-<td align="right">12.32925</td>
+<td align="right">12.329251</td>
+</tr>
+<tr class="even">
+<td>Mejor ARIMA</td>
+<td align="right">2.392268</td>
+<td align="right">6.989476</td>
 </tr>
 </tbody>
 </table>
+</div>
+<div id="recomendacion" class="section level2">
+<h2>2. Recomendación</h2>
+<p>Con base en el resumen de los errores del pronóstico, el mejor modelo de todos es ARIMA</p>
 </div>
 
 
