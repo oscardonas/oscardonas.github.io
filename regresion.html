@@ -15,7 +15,7 @@
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<link href="site_libs/bootstrap-3.3.5/css/united.min.css" rel="stylesheet" />
+<link href="site_libs/bootstrap-3.3.5/css/flatly.min.css" rel="stylesheet" />
 <script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
@@ -103,33 +103,33 @@ summary {
 <style type="text/css">
 /* padding for bootstrap navbar */
 body {
-  padding-top: 51px;
+  padding-top: 60px;
   padding-bottom: 40px;
 }
 /* offset scroll position for anchor links (for fixed navbar)  */
 .section h1 {
-  padding-top: 56px;
-  margin-top: -56px;
+  padding-top: 65px;
+  margin-top: -65px;
 }
 .section h2 {
-  padding-top: 56px;
-  margin-top: -56px;
+  padding-top: 65px;
+  margin-top: -65px;
 }
 .section h3 {
-  padding-top: 56px;
-  margin-top: -56px;
+  padding-top: 65px;
+  margin-top: -65px;
 }
 .section h4 {
-  padding-top: 56px;
-  margin-top: -56px;
+  padding-top: 65px;
+  margin-top: -65px;
 }
 .section h5 {
-  padding-top: 56px;
-  margin-top: -56px;
+  padding-top: 65px;
+  margin-top: -65px;
 }
 .section h6 {
-  padding-top: 56px;
-  margin-top: -56px;
+  padding-top: 65px;
+  margin-top: -65px;
 }
 .dropdown-submenu {
   position: relative;
@@ -605,7 +605,7 @@ ols_test_normality(rs.modelo1)     #Normalidad</code></pre>
 <pre><code>## [1] 2.145094e-16</code></pre>
 <pre class="r"><code>car::dwt(rs.modelo1)               #Ho no autocorrelación de residuos</code></pre>
 <pre><code>##  lag Autocorrelation D-W Statistic p-value
-##    1       0.1670674      1.614604    0.11
+##    1       0.1670674      1.614604   0.104
 ##  Alternative hypothesis: rho != 0</code></pre>
 <pre class="r"><code>ols_test_breusch_pagan(rs.modelo1) #Homosedasticidad</code></pre>
 <pre><code>## 
@@ -771,7 +771,7 @@ ols_test_normality(rs.modelo3)     #Normalidad</code></pre>
 <pre><code>## [1] -3.8268e-14</code></pre>
 <pre class="r"><code>car::dwt(rs.modelo3)               #Ho no autocorrelación de residuos</code></pre>
 <pre><code>##  lag Autocorrelation D-W Statistic p-value
-##    1       0.2221968      1.499948   0.022
+##    1       0.2221968      1.499948   0.052
 ##  Alternative hypothesis: rho != 0</code></pre>
 <pre class="r"><code>ols_test_breusch_pagan(rs.modelo3) #Homosedasticidad</code></pre>
 <pre><code>## 
@@ -854,7 +854,7 @@ ols_test_normality(rs.modelo4)     #Normalidad</code></pre>
 <pre><code>## [1] 0.0001814663</code></pre>
 <pre class="r"><code>car::dwt(rs.modelo4)               #Ho no autocorrelación de residuos</code></pre>
 <pre><code>##  lag Autocorrelation D-W Statistic p-value
-##    1       0.2693831      1.447361   0.018
+##    1       0.2693831      1.447361   0.016
 ##  Alternative hypothesis: rho != 0</code></pre>
 <pre class="r"><code>ols_test_breusch_pagan(rs.modelo4) #Homosedasticidad</code></pre>
 <pre><code>## 
@@ -952,7 +952,7 @@ ols_test_normality(rm.modelo1)     #Normalidad</code></pre>
 <pre><code>## [1] -4.510281e-17</code></pre>
 <pre class="r"><code>car::dwt(rm.modelo1)               #Ho no autocorrelación de residuos</code></pre>
 <pre><code>##  lag Autocorrelation D-W Statistic p-value
-##    1      -0.2466991      2.412738    0.18
+##    1      -0.2466991      2.412738   0.162
 ##  Alternative hypothesis: rho != 0</code></pre>
 <pre class="r"><code>ols_test_breusch_pagan(rm.modelo1) #Homosedasticidad</code></pre>
 <pre><code>## 
@@ -1120,7 +1120,7 @@ ols_test_normality(rm.modelo3)     #Normalidad</code></pre>
 <pre><code>## [1] 2.081668e-16</code></pre>
 <pre class="r"><code>car::dwt(rm.modelo3)               #Ho no autocorrelación de residuos</code></pre>
 <pre><code>##  lag Autocorrelation D-W Statistic p-value
-##    1       0.0890622      1.767884    0.22
+##    1       0.0890622      1.767884    0.26
 ##  Alternative hypothesis: rho != 0</code></pre>
 <pre class="r"><code>ols_test_breusch_pagan(rm.modelo3) #Homosedasticidad</code></pre>
 <pre><code>## 
@@ -1204,7 +1204,7 @@ ols_test_normality(rm.modelo4)     #Normalidad</code></pre>
 <pre><code>## [1] -1.00614e-16</code></pre>
 <pre class="r"><code>car::dwt(rm.modelo4)               #Ho no autocorrelación de residuos</code></pre>
 <pre><code>##  lag Autocorrelation D-W Statistic p-value
-##    1      0.03631128      1.799023    0.31
+##    1      0.03631128      1.799023   0.324
 ##  Alternative hypothesis: rho != 0</code></pre>
 <pre class="r"><code>ols_test_breusch_pagan(rm.modelo4) #Homosedasticidad</code></pre>
 <pre><code>## 
@@ -1288,7 +1288,7 @@ ols_test_normality(rm.modelo5)     #Normalidad</code></pre>
 <pre><code>## [1] -3.564857e-16</code></pre>
 <pre class="r"><code>car::dwt(rm.modelo5)               #Ho no autocorrelación de residuos</code></pre>
 <pre><code>##  lag Autocorrelation D-W Statistic p-value
-##    1      -0.2445895       2.40769   0.132
+##    1      -0.2445895       2.40769    0.17
 ##  Alternative hypothesis: rho != 0</code></pre>
 <pre class="r"><code>ols_test_breusch_pagan(rm.modelo5) #Homosedasticidad</code></pre>
 <pre><code>## 
@@ -1458,7 +1458,7 @@ ols_test_normality(rm.modelo7)     #Normalidad</code></pre>
 <pre><code>## [1] -1.605703e-16</code></pre>
 <pre class="r"><code>car::dwt(rm.modelo7)               #Ho no autocorrelación de residuos</code></pre>
 <pre><code>##  lag Autocorrelation D-W Statistic p-value
-##    1       0.1394375      1.673047   0.142
+##    1       0.1394375      1.673047   0.152
 ##  Alternative hypothesis: rho != 0</code></pre>
 <pre class="r"><code>ols_test_breusch_pagan(rm.modelo7) #Homosedasticidad</code></pre>
 <pre><code>## 
@@ -1542,7 +1542,7 @@ ols_test_normality(rm.modelo8)     #Normalidad</code></pre>
 <pre><code>## [1] -3.721659e-16</code></pre>
 <pre class="r"><code>car::dwt(rm.modelo8)               #Ho no autocorrelación de residuos</code></pre>
 <pre><code>##  lag Autocorrelation D-W Statistic p-value
-##    1      0.06381578      1.752494    0.27
+##    1      0.06381578      1.752494   0.262
 ##  Alternative hypothesis: rho != 0</code></pre>
 <pre class="r"><code>ols_test_breusch_pagan(rm.modelo8) #Homosedasticidad</code></pre>
 <pre><code>## 
@@ -1703,7 +1703,7 @@ ols_test_normality(rm.modelo10)     #Normalidad</code></pre>
 <pre><code>## [1] 5.551115e-17</code></pre>
 <pre class="r"><code>car::dwt(rm.modelo10)               #Ho no autocorrelación de residuos</code></pre>
 <pre><code>##  lag Autocorrelation D-W Statistic p-value
-##    1       0.0844588      1.694476   0.236
+##    1       0.0844588      1.694476   0.272
 ##  Alternative hypothesis: rho != 0</code></pre>
 <pre class="r"><code>ols_test_breusch_pagan(rm.modelo10) #Homosedasticidad</code></pre>
 <pre><code>## 
@@ -1802,22 +1802,48 @@ autoplot(datos.graf.rs)</code></pre>
                         Q3 &lt;- datos.panel.test[,6],
                         Torres_Gemelas &lt;- datos.panel.test[,7])
                         
-nuevas.xm</code></pre>
-<pre><code>##   t....datos.panel.test...2. Q1....datos.panel.test...4.
-## 1                         65                           1
-## 2                         66                           0
-## 3                         67                           0
-## 4                         68                           0
-##   Q2....datos.panel.test...5. Q3....datos.panel.test...6.
-## 1                           0                           0
-## 2                           1                           0
-## 3                           0                           1
-## 4                           0                           0
-##   Torres_Gemelas....datos.panel.test...7.
-## 1                                       1
-## 2                                       1
-## 3                                       1
-## 4                                       1</code></pre>
+knitr::kable(nuevas.xm)</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="right">t….datos.panel.test…2.</th>
+<th align="right">Q1….datos.panel.test…4.</th>
+<th align="right">Q2….datos.panel.test…5.</th>
+<th align="right">Q3….datos.panel.test…6.</th>
+<th align="right">Torres_Gemelas….datos.panel.test…7.</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">65</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="right">66</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="right">67</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="right">68</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">1</td>
+</tr>
+</tbody>
+</table>
 <pre class="r"><code>pronostico.rm &lt;- predict(rm.modelo5, newdata =  nuevas.x)
 pronostico.rm</code></pre>
 <pre><code>##        1        2        3        4 
